@@ -208,8 +208,8 @@ for (i in 1:nrow(CleanBaseballData)) {
   
   p <- p + annotation_raster(
     img, 
-    xmin = CleanBaseballData$DRTG[i] - 0.5, xmax = CleanBaseballData$DRTG[i] + 0.5, 
-    ymin = CleanBaseballData$ORTG[i] - 0.5, ymax = CleanBaseballData$ORTG[i] + 0.5
+    xmin = CleanBaseballData$DRTG[i] - 0.3, xmax = CleanBaseballData$DRTG[i] + 0.3, 
+    ymin = CleanBaseballData$ORTG[i] - 0.4, ymax = CleanBaseballData$ORTG[i] + 0.4
   )
 }
 
