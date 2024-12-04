@@ -147,6 +147,16 @@ CleanBaseballData$ORPG <- as.numeric(CleanBaseballData$ORPG)
 CleanBaseballData$RAA <- as.numeric(CleanBaseballData$RAA)
 CleanBaseballData$WAAWP <- as.numeric(CleanBaseballData$WAAWP)
 
+#Turning data into numeric (without pitch)
+CleanNoPitchData$War <- as.numeric(CleanNoPitchData$War)
+CleanNoPitchData$DRTG <- as.numeric(CleanNoPitchData$DRTG)
+CleanNoPitchData$ORTG <- as.numeric(CleanNoPitchData$ORTG)
+CleanNoPitchData$WAA <- as.numeric(CleanNoPitchData$WAA)
+CleanNoPitchData$TRPG <- as.numeric(CleanNoPitchData$TRPG)
+CleanNoPitchData$ORPG <- as.numeric(CleanNoPitchData$ORPG)
+CleanNoPitchData$RAA <- as.numeric(CleanNoPitchData$RAA)
+CleanNoPitchData$WAAWP <- as.numeric(CleanNoPitchData$WAAWP)
+
 #Creating Non-Pitcher Data
 CleanNoPitchData <- CleanBaseballData %>%
   filter(ORTG != 0 & DRTG != 0)
