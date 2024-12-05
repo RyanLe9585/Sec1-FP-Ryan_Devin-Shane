@@ -28,7 +28,10 @@ CleanBaseballData <- table1 %>%
 
 head(CleanBaseballData)
 names(CleanBaseballData) 
-colnames(CleanBaseballData) <- c("Rank", "Player", "War", "ORTG", "DRTG", "WAA", "TRPG", "ORPG", "RAA", "WAAWP")
+colnames(CleanBaseballData) <- c("Rank", "Player", "War", "ORTG", "DRTG", "WAA", 
+                                 "TRPG", "ORPG", "RAA", "WAAWP", "Position", "Player Image", 
+                                 "Weight", "Height")
+
 CleanBaseballData$Player <- c("A. Judge",
                               "B. Witt Jr", 
                               "S. Ohtani", 
@@ -80,6 +83,7 @@ CleanBaseballData$Player <- c("A. Judge",
                               "B. Doyle", 
                               "A. Gimenez"
 )
+
 str(CleanBaseballData)
 
 #Add Player Positions
@@ -134,6 +138,112 @@ CleanBaseballData$Position <- c("Outfield", #Judge
                                 "Outfield", #Doyle
                                 "Second Base" #Gimenez
   
+)
+
+#Add player weight
+CleanBaseballData$Weight <- c("282", #Judge
+                                "200", #Witt Jr
+                                "209", #Ohtani
+                                "220", #Henderson
+                                "212", #Duran
+                                "224", #Soto
+                                "215", #Chapman
+                                "190", #Lindor
+                                "190", #Ramirez
+                                "210", #Marte
+                                "240", #Skubal
+                                "242", #H. Greene
+                                "180", #Sale
+                                "245", #Vlad Jr
+                                "195", #Wheeler
+                                "235", #Skenes
+                                "205", #Fedde
+                                "225", #Rooker
+                                "200", #R. Greene
+                                "237", #Alvarez
+                                "225", #Lugo
+                                "200", #De La Cruz
+                                "185", #Neto
+                                "225", #Lopez
+                                "207", #Varsho
+                                "215", #Seager
+                                "190", #Ragans
+                                "185", #Winn
+                                "212", #Contreras
+                                "210", #Harper
+                                "180", #Betts
+                                "212", #Tucker
+                                "220", #Freeman
+                                "235", #Raleigh
+                                "188", #Turang
+                                "230", #Valdez
+                                "206", #Clase
+                                "265", #Banco
+                                "195", #Merrill
+                                "225", #Ozuna
+                                "228", #Rodriguez
+                                "215", #Hernandez
+                                "200", #Cease
+                                "245", #Crochet
+                                "190", #Bregman
+                                "195", #Semien
+                                "210", #King
+                                "202", #Pena
+                                "220", #Doyle
+                                "161" #Gimenez
+)
+
+#Add player height
+CleanBaseballData$Height <- c("79", #Judge
+                              "73", #Witt Jr
+                              "76", #Ohtani
+                              "75", #Henderson
+                              "74", #Duran
+                              "74", #Soto
+                              "72", #Chapman
+                              "71", #Lindor
+                              "69", #Ramirez
+                              "73", #Marte
+                              "75", #Skubal
+                              "76", #H. Greene
+                              "78", #Sale
+                              "74", #Vlad Jr
+                              "76", #Wheeler
+                              "76", #Skenes
+                              "74", #Fedde
+                              "75", #Rooker
+                              "75", #R. Greene
+                              "77", #Alvarez
+                              "76", #Lugo
+                              "77", #De La Cruz
+                              "70", #Neto
+                              "71", #Lopez
+                              "68", #Varsho
+                              "76", #Seager
+                              "76", #Ragans
+                              "71", #Winn
+                              "71", #Contreras
+                              "75", #Harper
+                              "69", #Betts
+                              "76", #Tucker
+                              "77", #Freeman
+                              "75", #Raleigh
+                              "72", #Turang
+                              "71", #Valdez
+                              "74", #Clase
+                              "75", #Banco
+                              "75", #Merrill
+                              "73", #Ozuna
+                              "75", #Rodriguez
+                              "74", #Hernandez
+                              "74", #Cease
+                              "78", #Crochet
+                              "72", #Bregman
+                              "72", #Semien
+                              "75", #King
+                              "72", #Pena
+                              "76", #Doyle
+                              "71" #Gimenez
 )
 
 #Add player pictures
@@ -201,6 +311,8 @@ CleanBaseballData$TRPG <- as.numeric(CleanBaseballData$TRPG)
 CleanBaseballData$ORPG <- as.numeric(CleanBaseballData$ORPG)
 CleanBaseballData$RAA <- as.numeric(CleanBaseballData$RAA)
 CleanBaseballData$WAAWP <- as.numeric(CleanBaseballData$WAAWP)
+CleanBaseballData$Weight <- as.numeric(CleanBaseballData$Weight)
+CleanBaseballData$Height <- as.numeric(CleanBaseballData$Height)
 
 #Turning data into numeric (without pitch)
 CleanNoPitchData$War <- as.numeric(CleanNoPitchData$War)
@@ -305,6 +417,7 @@ ggplot(CleanBaseballData,
        y = "WAR") + 
   theme_minimal() + 
   theme(axis.text.x = element_text(angle = 45))
+
 
 #-------------------------------------------------------------------------------
 #Add the images to the players points (work in progress)
