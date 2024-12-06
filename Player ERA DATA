@@ -1,0 +1,51 @@
+CleanBaseballData$ERA <- c("0", #Judge
+                                 "0", #Witt Jr
+                                 "0", #Ohtani
+                                 "0", #Henderson
+                                 "0", #Duran
+                                 "0", #Soto
+                                 "0", #Chapman
+                                 "0", #Lindor
+                                 "0", #Ramirez
+                                 "0", #Marte
+                                 "2.39", #Skubal
+                                 "2.75", #H. Greene
+                                 "2.38", #Sale
+                                 "0", #Vlad Jr
+                                 "2.57", #Wheeler
+                                 "1.96", #Skenes
+                                 "3.30", #Fedde
+                                 "0", #Rooker
+                                 "0", #R. Greene
+                                 "0", #Alvarez
+                                 "3.00", #Lugo
+                                 "0", #De La Cruz
+                                 "0", #Neto
+                                 "1.99", #Lopez
+                                 "0", #Varsho
+                                 "0", #Seager
+                                 "3.14", #Ragans
+                                 "0", #Winn
+                                 "0", #Contreras
+                                 "0", #Harper
+                                 "0", #Betts
+                                 "0", #Tucker
+                                 "0", #Freeman
+                                 "0", #Raleigh
+                                 "0", #Turang
+                                 "2.91", #Valdez
+                                 "0.61", #Clase
+                                 "2.80", #Blanco
+                                 "0", #Merrill
+                                 "0", #Ozuna
+                                 "0", #Rodriguez
+                                 "0", #Hernandez
+                                 "3.47", #Cease
+                                 "3.58", #Crochet
+                                 "0", #Bregman
+                                 "0", #Semien
+                                 "2.95", #King
+                                 "0", #Pena
+                                 "0", #Doyle
+                                 "0" #Gimenez
+)
