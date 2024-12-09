@@ -1,0 +1,145 @@
+library(rvest)
+library(dplyr)
+library(ggplot2)
+library(png)
+library(grid)
+library(ggrepel)
+library(ggforce)
+
+#Open Data through HTML
+Baseball_data_Pitch <- read_html("https://www.espn.com/mlb/war/leaders/_/type/pitching/mlb/war/leaders")
+#Open table of data 
+table_data_pitch <- Baseball_data_Pitch %>%
+  html_nodes("table") %>%
+  html_table(fill = TRUE)
+#Get to table
+table1_pitch <- table_data_pitch[[1]]
+
+#-------------------------------------------------------------------------------
+
+CleanPitchData <- table1_pitch %>%
+  slice(1:27)
+
+CleanPitchData <- CleanPitchData %>%
+  slice(-1, -2)
+
+colnames(CleanPitchData) <- c("Rank", "Player", "War", "RA", "RAR", "WAA", 
+                                 "WAAWP", "ORPG", "BIP", "PFF")
+
+CleanPitchData$Player <- c("T. Skubal",
+                              "H. Greene",
+                              "C. Sale",
+                              "Z. Wheeler",
+                              "P. Skenes",
+                              "E. Fedde",
+                              "S. Lugo",
+                              "R. Lopez",
+                              "C. Ragans",
+                              "F. Valdez",
+                              "E. Clase",
+                              "R. Blanco",
+                              "D. Cease",
+                              "G. Crochet",
+                              "M. King",
+                              "N. Martinez",
+                              "T. Scott",
+                              "L. Webb",
+                              "A. Nola",
+                              "T. Houck",
+                              "M. Wacha",
+                              "M. Fried",
+                              "C. Burnes",
+                              "B. Miller",
+                              "C. Sanchez"
+)
+
+CleanPitchData$ERA <- c("2.39", #Skubal
+                           "2.75", #Greene
+                           "2.38", #Sale
+                           "2.57", #Wheeler
+                           "1.96", #Skenes
+                           "3.30", #Fedde
+                           "3.00", #Lugo
+                           "1.99", #Lopez
+                           "3.14", #Ragans
+                           "2.91", #Valdez
+                           "0.61", # Clase
+                           "2.80", #Blanco
+                           "3.47", #Cease
+                           "3.58", #Crochet
+                           "2.95", #King
+                           "3.10", #Martinez
+                           "1.75", #Scott
+                           "3.47", #Webb
+                           "3.57", #Nola
+                           "3.12", #Houck
+                           "3.35", #Wacha
+                           "3.25", #Fried
+                           "2.92", #Burnes
+                           "2.94", #Miller
+                           "3.32" #Sanchez
+)
+
+CleanPitchData$FIP <- c("2.49", #Skubal
+                        "3.47", #Greene
+                        "2.09", #Sale
+                        "3.13", #Wheeler
+                        "2.44", #Skenes
+                        "3.86", #Fedde
+                        "3.25", #Lugo
+                        "2.92", #Lopez
+                        "2.99", #Ragans
+                        "3.25", #Valdez
+                        "2.22", # Clase
+                        "4.15", #Blanco
+                        "3.10", #Cease
+                        "2.96", #Crochet
+                        "3.33", #King
+                        "3.21", #Martinez
+                        "2.92", #Scott
+                        "2.95", #Webb
+                        "3.94", #Nola
+                        "3.32", #Houck
+                        "3.65", #Wacha
+                        "3.33", #Fried
+                        "3.55", #Burnes
+                        "3.58", #Miller
+                        "3.00" #Sanchez
+)
+
+CleanPitchData$img_path <- c("https://a.espncdn.com/combiner/i?img=/i/headshots/mlb/players/full/42409.png", #Skubal
+                        "https://a.espncdn.com/combiner/i?img=/i/headshots/mlb/players/full/39635.png", #Greene
+                        "https://a.espncdn.com/combiner/i?img=/i/headshots/mlb/players/full/30948.png", #Sale
+                        "https://a.espncdn.com/i/headshots/mlb/players/full/31267.png", #Wheeler
+                        "https://a.espncdn.com/i/headshots/mlb/players/full/4719507.png", #Skenes
+                        "https://a.espncdn.com/combiner/i?img=/i/headshots/mlb/players/full/33793.png", #Fedde
+                        "https://a.espncdn.com/combiner/i?img=/i/headshots/mlb/players/full/34873.png", #Lugo
+                        "https://a.espncdn.com/i/headshots/mlb/players/full/33860.png", #Lopez
+                        "https://a.espncdn.com/combiner/i?img=/i/headshots/mlb/players/full/41054.png&w=350&h=254", #Ragans
+                        "https://a.espncdn.com/combiner/i?img=/i/headshots/mlb/players/full/36581.png", #Valdez
+                        "https://a.espncdn.com/combiner/i?img=/i/headshots/mlb/players/full/41743.png", # Clase
+                        "https://a.espncdn.com/combiner/i?img=/i/headshots/mlb/players/full/41829.png", #Blanco
+                        "https://a.espncdn.com/combiner/i?img=/i/headshots/mlb/players/full/34943.png", #Cease
+                        "https://a.espncdn.com/combiner/i?img=/i/headshots/mlb/players/full/4297835.png", #Crochet
+                        "https://a.espncdn.com/combiner/i?img=/i/headshots/mlb/players/full/40429.png", #King
+                        "https://a.espncdn.com/combiner/i?img=/i/headshots/mlb/players/full/33372.png", #Martinez
+                        "https://a.espncdn.com/combiner/i?img=/i/headshots/mlb/players/full/35135.png&w=350&h=254", #Scott
+                        "https://a.espncdn.com/combiner/i?img=/i/headshots/mlb/players/full/41216.png", #Webb
+                        "https://a.espncdn.com/combiner/i?img=/i/headshots/mlb/players/full/33709.png", #Nola
+                        "https://a.espncdn.com/combiner/i?img=/i/headshots/mlb/players/full/41009.png", #Houck
+                        "https://a.espncdn.com/combiner/i?img=/i/headshots/mlb/players/full/32640.png", #Wacha
+                        "https://a.espncdn.com/combiner/i?img=/i/headshots/mlb/players/full/32685.png", #Fried
+                        "https://a.espncdn.com/combiner/i?img=/i/headshots/mlb/players/full/39878.png", #Burnes
+                        "https://a.espncdn.com/i/headshots/mlb/players/full/4654313.png", #Miller
+                        "https://a.espncdn.com/combiner/i?img=/i/headshots/mlb/players/full/42359.png" #Sanchez
+)
+
+CleanPitchData$War <- as.numeric(CleanPitchData$War)
+CleanPitchData$RA <- as.numeric(CleanPitchData$RA)
+CleanPitchData$WAA <- as.numeric(CleanPitchData$WAA)
+CleanPitchData$WAAWP <- as.numeric(CleanPitchData$WAAWP)
+CleanPitchData$ORPG <- as.numeric(CleanPitchData$ORPG)
+CleanPitchData$BIP <- as.numeric(CleanPitchData$BIP)
+CleanPitchData$PFF <- as.numeric(CleanPitchData$PFF)
+CleanPitchData$ERA <- as.numeric(CleanPitchData$ERA)
+CleanPitchData$FIP <- as.numeric(CleanPitchData$FIP)
