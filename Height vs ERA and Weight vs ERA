@@ -1,0 +1,26 @@
+# Convert ERA to numeric for plotting
+CleanBaseballData$ERA <- as.numeric(CleanBaseballData$ERA)
+CleanBaseballData$Height <- as.numeric(CleanBaseballData$Height)
+CleanBaseballData$Weight <- as.numeric(CleanBaseballData$Weight)
+
+# Create a scatter plot comparing Height to ERA
+height_vs_era <- ggplot(CleanBaseballData, aes(x = Height, y = ERA)) +
+  geom_point(color = "blue", size = 3) +
+  geom_smooth(method = "lm", color = "red", se = FALSE) +
+  labs(title = "Height vs ERA",
+       x = "Height (inches)",
+       y = "ERA") +
+  theme_minimal()
+
+# Create a scatter plot comparing Weight to ERA
+weight_vs_era <- ggplot(CleanBaseballData, aes(x = Weight, y = ERA)) +
+  geom_point(color = "green", size = 3) +
+  geom_smooth(method = "lm", color = "red", se = FALSE) +
+  labs(title = "Weight vs ERA",
+       x = "Weight (lbs)",
+       y = "ERA") +
+  theme_minimal()
+
+# Print the plots
+print(height_vs_era)
+print(weight_vs_era)
