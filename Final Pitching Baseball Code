@@ -1,0 +1,333 @@
+#For Inputing Pictures in Graphs and Plots
+#You can use my data from a project as an example
+
+#If you want me to explaing further in depth how things work in the code or something 
+#doesn't work, text the GC and I'll see what I can do
+
+#Steps
+#1. Download Packages
+#2. Download Data 
+#3. Clean the Data 
+#4. Add any new necessary Data
+#5. Filter Data to how you see fit 
+#6. Rename Columns 
+#7. Run the code to create the readPNGfromURL function 
+#8. Create you plots
+#9. Add on the remaining code that inputs images for data points
+
+#Download Necessary Packages 
+library(rvest)
+library(dplyr)
+library(ggplot2)
+library(png)
+library(grid)
+library(ggrepel)
+library(ggforce)
+
+#Open Data through HTML
+Baseball_data_Pitch <- read_html("https://www.espn.com/mlb/war/leaders/_/type/pitching/mlb/war/leaders")
+#Open table of data 
+table_data_pitch <- Baseball_data_Pitch %>%
+  html_nodes("table") %>%
+  html_table(fill = TRUE)
+#Get to table
+table1_pitch <- table_data_pitch[[1]]
+
+#-------------------------------------------------------------------------------
+
+CleanPitchData <- table1_pitch %>%
+  slice(1:27)
+
+CleanPitchData <- CleanPitchData %>%
+  slice(-1, -2)
+
+colnames(CleanPitchData) <- c("Rank", "Player", "War", "RA", "RAR", "WAA", 
+                                 "WAAWP", "ORPG", "BIP", "PFF")
+
+CleanPitchData$Player <- c("T. Skubal",
+                              "H. Greene",
+                              "C. Sale",
+                              "Z. Wheeler",
+                              "P. Skenes",
+                              "E. Fedde",
+                              "S. Lugo",
+                              "R. Lopez",
+                              "C. Ragans",
+                              "F. Valdez",
+                              "E. Clase",
+                              "R. Blanco",
+                              "D. Cease",
+                              "G. Crochet",
+                              "M. King",
+                              "N. Martinez",
+                              "T. Scott",
+                              "L. Webb",
+                              "A. Nola",
+                              "T. Houck",
+                              "M. Wacha",
+                              "M. Fried",
+                              "C. Burnes",
+                              "B. Miller",
+                              "C. Sanchez"
+)
+
+CleanPitchData$ERA <- c("2.39", #Skubal
+                           "2.75", #Greene
+                           "2.38", #Sale
+                           "2.57", #Wheeler
+                           "1.96", #Skenes
+                           "3.30", #Fedde
+                           "3.00", #Lugo
+                           "1.99", #Lopez
+                           "3.14", #Ragans
+                           "2.91", #Valdez
+                           "0.61", # Clase
+                           "2.80", #Blanco
+                           "3.47", #Cease
+                           "3.58", #Crochet
+                           "2.95", #King
+                           "3.10", #Martinez
+                           "1.75", #Scott
+                           "3.47", #Webb
+                           "3.57", #Nola
+                           "3.12", #Houck
+                           "3.35", #Wacha
+                           "3.25", #Fried
+                           "2.92", #Burnes
+                           "2.94", #Miller
+                           "3.32" #Sanchez
+)
+
+CleanPitchData$FIP <- c("2.49", #Skubal
+                        "3.47", #Greene
+                        "2.09", #Sale
+                        "3.13", #Wheeler
+                        "2.44", #Skenes
+                        "3.86", #Fedde
+                        "3.25", #Lugo
+                        "2.92", #Lopez
+                        "2.99", #Ragans
+                        "3.25", #Valdez
+                        "2.22", # Clase
+                        "4.15", #Blanco
+                        "3.10", #Cease
+                        "2.96", #Crochet
+                        "3.33", #King
+                        "3.21", #Martinez
+                        "2.92", #Scott
+                        "2.95", #Webb
+                        "3.94", #Nola
+                        "3.32", #Houck
+                        "3.65", #Wacha
+                        "3.33", #Fried
+                        "3.55", #Burnes
+                        "3.58", #Miller
+                        "3.00" #Sanchez
+)
+
+CleanPitchData$Age <- c("28", #Skubal
+                        "25", #Greene
+                        "35", #Sale
+                        "34", #Wheeler
+                        "22", #Skenes
+                        "31", #Fedde
+                        "35", #Lugo
+                        "30", #Lopez
+                        "26", #Ragans
+                        "31", #Valdez
+                        "26", #Clase
+                        "31", #Blanco
+                        "28", #Cease
+                        "25", #Crochet
+                        "29", #King
+                        "34", #Martinez
+                        "30", #Scott
+                        "28", #Webb
+                        "31", #Nola
+                        "28", #Houck
+                        "33", #Wacha
+                        "30", #Fried
+                        "30", #Burnes
+                        "26", #Miller
+                        "27" #Sanchez
+)
+
+CleanPitchData$Height <- c("75", #Skubal
+                        "77", #Greene
+                        "78", #Sale
+                        "76", #Wheeler
+                        "76", #Skenes
+                        "74", #Fedde
+                        "76", #Lugo
+                        "71", #Lopez
+                        "76", #Ragans
+                        "71", #Valdez
+                        "74", # Clase
+                        "75", #Blanco
+                        "74", #Cease
+                        "78", #Crochet
+                        "75", #King
+                        "73", #Martinez
+                        "72", #Scott
+                        "73", #Webb
+                        "73", #Nola
+                        "77", #Houck
+                        "78", #Wacha
+                        "76", #Fried
+                        "75", #Burnes
+                        "74", #Miller
+                        "73" #Sanchez
+)
+
+CleanPitchData$img_path <- c("https://a.espncdn.com/combiner/i?img=/i/headshots/mlb/players/full/42409.png", #Skubal
+                        "https://a.espncdn.com/combiner/i?img=/i/headshots/mlb/players/full/39635.png", #Greene
+                        "https://a.espncdn.com/combiner/i?img=/i/headshots/mlb/players/full/30948.png", #Sale
+                        "https://a.espncdn.com/i/headshots/mlb/players/full/31267.png", #Wheeler
+                        "https://a.espncdn.com/i/headshots/mlb/players/full/4719507.png", #Skenes
+                        "https://a.espncdn.com/combiner/i?img=/i/headshots/mlb/players/full/33793.png", #Fedde
+                        "https://a.espncdn.com/combiner/i?img=/i/headshots/mlb/players/full/34873.png", #Lugo
+                        "https://a.espncdn.com/i/headshots/mlb/players/full/33860.png", #Lopez
+                        "https://a.espncdn.com/combiner/i?img=/i/headshots/mlb/players/full/41054.png&w=350&h=254", #Ragans
+                        "https://a.espncdn.com/combiner/i?img=/i/headshots/mlb/players/full/36581.png", #Valdez
+                        "https://a.espncdn.com/combiner/i?img=/i/headshots/mlb/players/full/41743.png", # Clase
+                        "https://a.espncdn.com/combiner/i?img=/i/headshots/mlb/players/full/41829.png", #Blanco
+                        "https://a.espncdn.com/combiner/i?img=/i/headshots/mlb/players/full/34943.png", #Cease
+                        "https://a.espncdn.com/combiner/i?img=/i/headshots/mlb/players/full/4297835.png", #Crochet
+                        "https://a.espncdn.com/combiner/i?img=/i/headshots/mlb/players/full/40429.png", #King
+                        "https://a.espncdn.com/combiner/i?img=/i/headshots/mlb/players/full/33372.png", #Martinez
+                        "https://a.espncdn.com/combiner/i?img=/i/headshots/mlb/players/full/35135.png&w=350&h=254", #Scott
+                        "https://a.espncdn.com/combiner/i?img=/i/headshots/mlb/players/full/41216.png", #Webb
+                        "https://a.espncdn.com/combiner/i?img=/i/headshots/mlb/players/full/33709.png", #Nola
+                        "https://a.espncdn.com/combiner/i?img=/i/headshots/mlb/players/full/41009.png", #Houck
+                        "https://a.espncdn.com/combiner/i?img=/i/headshots/mlb/players/full/32640.png", #Wacha
+                        "https://a.espncdn.com/combiner/i?img=/i/headshots/mlb/players/full/32685.png", #Fried
+                        "https://a.espncdn.com/combiner/i?img=/i/headshots/mlb/players/full/39878.png", #Burnes
+                        "https://a.espncdn.com/i/headshots/mlb/players/full/4654313.png", #Miller
+                        "https://a.espncdn.com/combiner/i?img=/i/headshots/mlb/players/full/42359.png" #Sanchez
+)
+
+CleanPitchData$War <- as.numeric(CleanPitchData$War)
+CleanPitchData$RA <- as.numeric(CleanPitchData$RA)
+CleanPitchData$WAA <- as.numeric(CleanPitchData$WAA)
+CleanPitchData$WAAWP <- as.numeric(CleanPitchData$WAAWP)
+CleanPitchData$ORPG <- as.numeric(CleanPitchData$ORPG)
+CleanPitchData$BIP <- as.numeric(CleanPitchData$BIP)
+CleanPitchData$PFF <- as.numeric(CleanPitchData$PFF)
+CleanPitchData$ERA <- as.numeric(CleanPitchData$ERA)
+CleanPitchData$FIP <- as.numeric(CleanPitchData$FIP)
+CleanPitchData$Age <- as.numeric(CleanPitchData$Age)
+CleanPitchData$Height <- as.numeric(CleanPitchData$Height)
+
+readPNGfromURL <- function(url) {
+  temp <- tempfile()
+  download.file(url, temp, mode = "wb")
+  img <- readPNG(temp)
+  unlink(temp)
+  return(img)
+}
+
+#-------------------------------------------------------------------------------
+#Relationship Between WAR and ERA
+r_ERA_WAR <- ggplot(data = CleanPitchData, 
+                    mapping = aes(ERA, 
+                                  War)) +
+  geom_point() + 
+  labs(title = "Relationship between ERA and WAR", 
+       x = "ERA", 
+       y = "WAR")
+
+for (i in 1:nrow(CleanPitchData)) {
+  img <- readPNGfromURL(CleanPitchData$img_path[i])
+  
+  r_ERA_WAR <- r_ERA_WAR + annotation_raster(
+    img, 
+    xmin = CleanPitchData$ERA[i] - 0.1, xmax = CleanPitchData$ERA[i] + 0.1, 
+    ymin = CleanPitchData$War[i] - 0.15, ymax = CleanPitchData$War[i] + 0.15
+  )
+}
+
+print(r_ERA_WAR)
+
+#Relationship Between WAR and FIP
+r_FIP_WAR <- ggplot(data = CleanPitchData, 
+                    mapping = aes(FIP, 
+                                  War)) +
+  geom_point() + 
+  labs(title = "Relationship between ERA and WAR", 
+       x = "FIP", 
+       y = "WAR")
+
+for (i in 1:nrow(CleanPitchData)) {
+  img <- readPNGfromURL(CleanPitchData$img_path[i])
+  
+  r_FIP_WAR <- r_FIP_WAR + annotation_raster(
+    img, 
+    xmin = CleanPitchData$FIP[i] - 0.05, xmax = CleanPitchData$FIP[i] + 0.05, 
+    ymin = CleanPitchData$War[i] - 0.125, ymax = CleanPitchData$War[i] + 0.125
+  )
+}
+
+print(r_FIP_WAR)
+
+#Relationship Between ERA and FIP
+r_FIP_ERA <- ggplot(data = CleanPitchData, 
+                    mapping = aes(FIP, 
+                                  ERA)) +
+  geom_point() + 
+  labs(title = "Relationship between ERA and WAR", 
+       x = "FIP", 
+       y = "ERA")
+
+for (i in 1:nrow(CleanPitchData)) {
+  img <- readPNGfromURL(CleanPitchData$img_path[i])
+  
+  r_FIP_ERA <- r_FIP_ERA + annotation_raster(
+    img, 
+    xmin = CleanPitchData$FIP[i] - 0.075, xmax = CleanPitchData$FIP[i] + 0.075, 
+    ymin = CleanPitchData$ERA[i] - 0.125, ymax = CleanPitchData$ERA[i] + 0.125
+  )
+}
+
+print(r_FIP_ERA)
+
+#Relationship Between Age and FIP
+r_FIP_Age <- ggplot(data = CleanPitchData, 
+                    mapping = aes(Age, 
+                                  FIP)) +
+  geom_point() + 
+  labs(title = "Relationship between Age and FIP", 
+       x = "Age", 
+       y = "FIP")
+
+for (i in 1:nrow(CleanPitchData)) {
+  img <- readPNGfromURL(CleanPitchData$img_path[i])
+  
+  r_FIP_Age <- r_FIP_Age + annotation_raster(
+    img, 
+    xmin = CleanPitchData$Age[i] - 0.4, xmax = CleanPitchData$Age[i] + 0.4, 
+    ymin = CleanPitchData$FIP[i] - 0.075, ymax = CleanPitchData$FIP[i] + 0.075
+  )
+}
+
+print(r_FIP_Age)
+
+#Relationship Between Height and FIP
+r_FIP_Height <- ggplot(data = CleanPitchData, 
+                    mapping = aes(Height, 
+                                  FIP)) +
+  geom_point() + 
+  labs(title = "Relationship between Age and FIP", 
+       x = "Height", 
+       y = "FIP")
+
+for (i in 1:nrow(CleanPitchData)) {
+  img <- readPNGfromURL(CleanPitchData$img_path[i])
+  
+  r_FIP_Height <- r_FIP_Height + annotation_raster(
+    img, 
+    xmin = CleanPitchData$Height[i] - 0.2, xmax = CleanPitchData$Height[i] + 0.2, 
+    ymin = CleanPitchData$FIP[i] - 0.075, ymax = CleanPitchData$FIP[i] + 0.075
+  )
+}
+
+print(r_FIP_Height)
