@@ -1,0 +1,602 @@
+#read HTML (https://www.espn.com/mlb/war/leaders)
+#HTML elements CSS
+#html_table
+
+#For High War Players 
+library(rvest)
+library(dplyr)
+library(ggplot2)
+library(png)
+library(grid)
+library(ggrepel)
+library(ggforce)
+
+#Open Data through HTML
+Baseball_data <- read_html("https://www.espn.com/mlb/war/leaders")
+#Open table of data 
+table_data <- Baseball_data %>%
+  html_nodes("table") %>%
+  html_table(fill = TRUE)
+#Get to table
+table1 <- table_data[[1]]
+
+#-------------------------------------------------------------------------------
+
+#Clean the data
+CleanBaseballData <- table1 %>%
+  slice(-1, -2)
+
+head(CleanBaseballData)
+names(CleanBaseballData) 
+colnames(CleanBaseballData) <- c("Rank", "Player", "War", "ORTG", "DRTG", "WAA", 
+                                 "TRPG", "ORPG", "RAA", "WAAWP")
+
+colnames(CleanBaseballData) <- c("Rank", "Player", "War", "ORTG", "DRTG", "WAA", 
+                                 "TRPG", "ORPG", "RAA", "WAAWP", "Position", "Weight", 
+                                 "Height", "WRC+", "Player Image File", "Bat Speed")
+
+CleanBaseballData$Player <- c("A. Judge",
+                              "B. Witt Jr", 
+                              "S. Ohtani", 
+                              "G. Henderson", 
+                              "J. Duran", 
+                              "J. Soto", 
+                              "M. Chapman",
+                              "F. Lindor", 
+                              "J. Ramirez", 
+                              "K. Marte", 
+                              "T. Skubal",
+                              "H. Greene", 
+                              "C. Sale", 
+                              "V. Guerrero Jr", 
+                              "Z. Wheeler",
+                              "P. Skenes", 
+                              "E. Fedde", 
+                              "B. Rooker", 
+                              "R. Greene",
+                              "Y. Alvarez", 
+                              "S. Lugo", 
+                              "E. De La Cruz", 
+                              "Z. Neto",
+                              "R. Lopez", 
+                              "D. Varsho", 
+                              "C. Seager", 
+                              "C. Ragans",
+                              "M. Winn", 
+                              "W. Contreras", 
+                              "B. Harper", 
+                              "M. Betts", 
+                              "K. Tucker", 
+                              "F. Freeman", 
+                              "C. Raleigh",
+                              "B. Turang", 
+                              "F. Valdez", 
+                              "E. Clase", 
+                              "R. Blanco",
+                              "J. Merrill", 
+                              "M. Ozuna", 
+                              "J. Rodriguez", 
+                              "T. Hernandez",
+                              "D. Cease", 
+                              "G. Crochet", 
+                              "A. Bregman", 
+                              "M. Semien",
+                              "M. King", 
+                              "J. Pena", 
+                              "B. Doyle", 
+                              "A. Gimenez"
+)
+
+str(CleanBaseballData)
+
+#Add Player Positions
+CleanBaseballData$Position <- c("Outfield", #Judge
+                                "Shortstop", #Witt Jr
+                                "Designated Hitter", #Ohtani
+                                "Shortstop", #Henderson
+                                "Outfield", #Duran
+                                "Outfield", #Soto
+                                "Third Base", #Chapman
+                                "Shortstop", #Lindor
+                                "Third Base", #Ramirez
+                                "Second Base", #Marte
+                                "Pitcher", #Skubal
+                                "Pitcher", #H. Greene
+                                "Pitcher", #Sale
+                                "First Base", #Vlad Jr
+                                "Pitcher", #Wheeler
+                                "Pitcher", #Skenes
+                                "Pitcher", #Fedde
+                                "Designated Hitter", #Rooker
+                                "Outfield", #R. Greene
+                                "Designated Hitter", #Alvarez
+                                "Pitcher", #Lugo
+                                "Shortstop", #De La Cruz
+                                "Shortstop", #Neto
+                                "Pitcher", #Lopez
+                                "Outfield", #Varsho
+                                "Shortstop", #Seager
+                                "Pitcher", #Ragans
+                                "Shortstop", #Winn
+                                "Catcher", #Contreras
+                                "First Base", #Harper
+                                "Shortstop", #Betts
+                                "Outfield", #Tucker
+                                "First Base", #Freeman
+                                "Catcher", #Raleigh
+                                "Second Base", #Turang
+                                "Pitcher", #Valdez
+                                "Pitcher", #Clase
+                                "Pitcher", #Banco
+                                "Outfield", #Merrill
+                                "Designated Hitter", #Ozuna
+                                "Outfield", #Rodriguez
+                                "Outfield", #Hernandez
+                                "Pitcher", #Cease
+                                "Pitcher", #Crochet
+                                "Third Base", #Bregman
+                                "Second Base", #Semien
+                                "Pitcher", #King
+                                "Shortstop", #Pena
+                                "Outfield", #Doyle
+                                "Second Base" #Gimenez
+)
+
+#Add player weight
+CleanBaseballData$Weight <- c("282", #Judge
+                                "200", #Witt Jr
+                                "209", #Ohtani
+                                "220", #Henderson
+                                "212", #Duran
+                                "224", #Soto
+                                "215", #Chapman
+                                "190", #Lindor
+                                "190", #Ramirez
+                                "210", #Marte
+                                "240", #Skubal
+                                "242", #H. Greene
+                                "180", #Sale
+                                "245", #Vlad Jr
+                                "195", #Wheeler
+                                "235", #Skenes
+                                "205", #Fedde
+                                "225", #Rooker
+                                "200", #R. Greene
+                                "237", #Alvarez
+                                "225", #Lugo
+                                "200", #De La Cruz
+                                "185", #Neto
+                                "225", #Lopez
+                                "207", #Varsho
+                                "215", #Seager
+                                "190", #Ragans
+                                "185", #Winn
+                                "212", #Contreras
+                                "210", #Harper
+                                "180", #Betts
+                                "212", #Tucker
+                                "220", #Freeman
+                                "235", #Raleigh
+                                "188", #Turang
+                                "230", #Valdez
+                                "206", #Clase
+                                "265", #Banco
+                                "195", #Merrill
+                                "225", #Ozuna
+                                "228", #Rodriguez
+                                "215", #Hernandez
+                                "200", #Cease
+                                "245", #Crochet
+                                "190", #Bregman
+                                "195", #Semien
+                                "210", #King
+                                "202", #Pena
+                                "220", #Doyle
+                                "161" #Gimenez
+)
+
+#Add player height
+CleanBaseballData$Height <- c("79", #Judge
+                              "73", #Witt Jr
+                              "76", #Ohtani
+                              "75", #Henderson
+                              "74", #Duran
+                              "74", #Soto
+                              "72", #Chapman
+                              "71", #Lindor
+                              "69", #Ramirez
+                              "73", #Marte
+                              "75", #Skubal
+                              "76", #H. Greene
+                              "78", #Sale
+                              "74", #Vlad Jr
+                              "76", #Wheeler
+                              "76", #Skenes
+                              "74", #Fedde
+                              "75", #Rooker
+                              "75", #R. Greene
+                              "77", #Alvarez
+                              "76", #Lugo
+                              "77", #De La Cruz
+                              "70", #Neto
+                              "71", #Lopez
+                              "68", #Varsho
+                              "76", #Seager
+                              "76", #Ragans
+                              "71", #Winn
+                              "71", #Contreras
+                              "75", #Harper
+                              "69", #Betts
+                              "76", #Tucker
+                              "77", #Freeman
+                              "75", #Raleigh
+                              "72", #Turang
+                              "71", #Valdez
+                              "74", #Clase
+                              "75", #Banco
+                              "75", #Merrill
+                              "73", #Ozuna
+                              "75", #Rodriguez
+                              "74", #Hernandez
+                              "74", #Cease
+                              "78", #Crochet
+                              "72", #Bregman
+                              "72", #Semien
+                              "75", #King
+                              "72", #Pena
+                              "76", #Doyle
+                              "71" #Gimenez
+)
+
+#All WRC+
+CleanBaseballData$WRC_plus <- c("218", #Judge
+                                "168", #Witt Jr
+                                "181", #Ohtani
+                                "155", #Henderson
+                                "129", #Duran
+                                "180", #Soto
+                                "121", #Chapman
+                                "137", #Lindor
+                                "141", #Ramirez
+                                "151", #Marte
+                                "0", #Skubal
+                                "0", #H. Greene
+                                "0", #Sale
+                                "165", #Vlad Jr
+                                "0", #Wheeler
+                                "0", #Skenes
+                                "0", #Fedde
+                                "164", #Rooker
+                                "135", #R. Greene
+                                "168", #Alvarez
+                                "0", #Lugo
+                                "118", #De La Cruz
+                                "114", #Neto
+                                "0", #Lopez
+                                "99", #Varsho
+                                "140", #Seager
+                                "0", #Ragans
+                                "103", #Winn
+                                "131", #Contreras
+                                "145", #Harper
+                                "141", #Betts
+                                "0", #Tucker
+                                "137", #Freeman
+                                "117", #Raleigh
+                                "87", #Turang
+                                "0", #Valdez
+                                "0", #Clase
+                                "0", #Banco
+                                "130", #Merrill
+                                "154", #Ozuna
+                                "116", #Rodriguez
+                                "134", #Hernandez
+                                "0", #Cease
+                                "0", #Crochet
+                                "118", #Bregman
+                                "99", #Semien
+                                "0", #King
+                                "100", #Pena
+                                "97", #Doyle
+                                "83" #Gimenez
+)
+
+#Add Bat Speed (competitive swings)
+CleanBaseballData$BatSpeed <- c("77.2", #Judge
+                                "74.7", #Witt Jr
+                                "76.3", #Ohtani
+                                "76.3", #Henderson
+                                "73.6", #Duran
+                                "75.5", #Soto
+                                "76.6", #Chapman
+                                "72.3", #Lindor
+                                "71.6", #Ramirez
+                                "73.7", #Marte
+                                "0", #Skubal
+                                "0", #H. Greene
+                                "0", #Sale
+                                "75.9", #Vlad Jr
+                                "0", #Wheeler
+                                "0", #Skenes
+                                "0", #Fedde
+                                "73.7", #Rooker
+                                "74.6", #R. Greene
+                                "76.6", #Alvarez
+                                "0", #Lugo
+                                "75.2", #De La Cruz
+                                "71.0", #Neto
+                                "0", #Lopez
+                                "73.7", #Varsho
+                                "72.3", #Seager
+                                "0", #Ragans
+                                "70.2", #Winn
+                                "74.7", #Contreras
+                                "74.1", #Harper
+                                "69.1", #Betts
+                                "0", #Tucker
+                                "69.8", #Freeman
+                                "74.5", #Raleigh
+                                "66.2", #Turang
+                                "0", #Valdez
+                                "0", #Clase
+                                "0", #Banco
+                                "72.2", #Merrill
+                                "74.0", #Ozuna
+                                "76.3", #Rodriguez
+                                "73.3", #Hernandez
+                                "0", #Cease
+                                "0", #Crochet
+                                "71.4", #Bregman
+                                "68.3", #Semien
+                                "0", #King
+                                "72.6", #Pena
+                                "70.9", #Doyle
+                                "68.2" #Gimenez
+)
+
+
+
+#Add player pictures
+CleanBaseballData$img_path <- c(
+  "https://a.espncdn.com/combiner/i?img=/i/headshots/mlb/players/full/33192.png", #Judge
+  "https://a.espncdn.com/combiner/i?img=/i/headshots/mlb/players/full/42403.png", #Witt Jr
+  "https://a.espncdn.com/combiner/i?img=/i/headshots/mlb/players/full/39832.png", #Ohtani
+  "https://a.espncdn.com/combiner/i?img=/i/headshots/mlb/players/full/42507.png", #Henderson
+  "https://a.espncdn.com/combiner/i?img=/i/headshots/mlb/players/full/41610.png", #Duran
+  "https://a.espncdn.com/combiner/i?img=/i/headshots/mlb/players/full/36969.png", #Soto
+  "https://a.espncdn.com/combiner/i?img=/i/headshots/mlb/players/full/33857.png", #Chapman
+  "https://a.espncdn.com/combiner/i?img=/i/headshots/mlb/players/full/32129.png", #Lindor
+  "https://a.espncdn.com/combiner/i?img=/i/headshots/mlb/players/full/32801.png&w=350&h=254", #Ramirez
+  "https://a.espncdn.com/combiner/i?img=/i/headshots/mlb/players/full/32512.png", #Marte
+  "https://a.espncdn.com/combiner/i?img=/i/headshots/mlb/players/full/42409.png", #Skubal
+  "https://a.espncdn.com/combiner/i?img=/i/headshots/mlb/players/full/39635.png", #H. Greene
+  "https://a.espncdn.com/combiner/i?img=/i/headshots/mlb/players/full/30948.png", #Sale
+  "https://a.espncdn.com/i/headshots/mlb/players/full/35002.png", #Vlad Jr
+  "https://a.espncdn.com/combiner/i?img=/i/headshots/mlb/players/full/31267.png", #Wheeler
+  "https://a.espncdn.com/i/headshots/mlb/players/full/4719507.png", #Skenes
+  "https://a.espncdn.com/combiner/i?img=/i/headshots/mlb/players/full/33793.png", #Fedde
+  "https://a.espncdn.com/combiner/i?img=/i/headshots/mlb/players/full/40926.png", #Rooker
+  "https://a.espncdn.com/combiner/i?img=/i/headshots/mlb/players/full/42179.png", #R. Greene
+  "https://a.espncdn.com/combiner/i?img=/i/headshots/mlb/players/full/36018.png", #Alvarez
+  "https://a.espncdn.com/combiner/i?img=/i/headshots/mlb/players/full/34873.png", #Lugo
+  "https://a.espncdn.com/combiner/i?img=/i/headshots/mlb/players/full/4917694.png", #De La Cruz
+  "https://a.espncdn.com/combiner/i?img=/i/headshots/mlb/players/full/4666100.png", #Neto
+  "https://a.espncdn.com/i/headshots/mlb/players/full/33860.png", #Lopez
+  "https://a.espncdn.com/combiner/i?img=/i/headshots/mlb/players/full/40963.png", #Varsho
+  "https://a.espncdn.com/combiner/i?img=/i/headshots/mlb/players/full/32691.png", #Seager
+  "https://a.espncdn.com/combiner/i?img=/i/headshots/mlb/players/full/41054.png&w=350&h=254", #Ragans
+  "https://a.espncdn.com/combiner/i?img=/i/headshots/mlb/players/full/4683365.png", #Winn
+  "https://a.espncdn.com/combiner/i?img=/i/headshots/mlb/players/full/39895.png", #Contreras
+  "https://a.espncdn.com/combiner/i?img=/i/headshots/mlb/players/full/30951.png", #Harper
+  "https://a.espncdn.com/combiner/i?img=/i/headshots/mlb/players/full/33039.png", #Betts
+  "https://a.espncdn.com/combiner/i?img=/i/headshots/mlb/players/full/34967.png", #Tucker
+  "https://a.espncdn.com/combiner/i?img=/i/headshots/mlb/players/full/30193.png", #Freeman
+  "https://a.espncdn.com/combiner/i?img=/i/headshots/mlb/players/full/41292.png&w=350&h=254", #Raleigh
+  "https://a.espncdn.com/combiner/i?img=/i/headshots/mlb/players/full/41179.png", #Turang
+  "https://a.espncdn.com/combiner/i?img=/i/headshots/mlb/players/full/36581.png", #Valdez
+  "https://a.espncdn.com/combiner/i?img=/i/headshots/mlb/players/full/41743.png", #Clase
+  "https://a.espncdn.com/combiner/i?img=/i/headshots/mlb/players/full/41829.png", #Banco
+  "https://a.espncdn.com/combiner/i?img=/i/headshots/mlb/players/full/4872691.png", #Merrill
+  "https://a.espncdn.com/combiner/i?img=/i/headshots/mlb/players/full/31668.png", #Ozuna
+  "https://a.espncdn.com/combiner/i?img=/i/headshots/mlb/players/full/41044.png", #Rodriguez
+  "https://a.espncdn.com/combiner/i?img=/i/headshots/mlb/players/full/33377.png", #Hernandez
+  "https://a.espncdn.com/combiner/i?img=/i/headshots/mlb/players/full/34943.png", #Cease
+  "https://a.espncdn.com/combiner/i?img=/i/headshots/mlb/players/full/4297835.png", #Crochet
+  "https://a.espncdn.com/combiner/i?img=/i/headshots/mlb/players/full/34886.png&w=350&h=254", #Bregman
+  "https://a.espncdn.com/combiner/i?img=/i/headshots/mlb/players/full/32146.png", #Semien
+  "https://a.espncdn.com/combiner/i?img=/i/headshots/mlb/players/full/40429.png", #King
+  "https://a.espncdn.com/combiner/i?img=/i/headshots/mlb/players/full/41273.png", #Pena
+  "https://a.espncdn.com/combiner/i?img=/i/headshots/mlb/players/full/42462.png", #Doyle
+  "https://a.espncdn.com/combiner/i?img=/i/headshots/mlb/players/full/37729.png" #Gimenez
+  )
+class(CleanBaseballData$War)
+class(CleanNoPitchData$War)
+
+#Turning data into numeric (with pitch)
+CleanBaseballData$War <- as.numeric(CleanBaseballData$War)
+CleanBaseballData$DRTG <- as.numeric(CleanBaseballData$DRTG)
+CleanBaseballData$ORTG <- as.numeric(CleanBaseballData$ORTG)
+CleanBaseballData$WAA <- as.numeric(CleanBaseballData$WAA)
+CleanBaseballData$TRPG <- as.numeric(CleanBaseballData$TRPG)
+CleanBaseballData$ORPG <- as.numeric(CleanBaseballData$ORPG)
+CleanBaseballData$RAA <- as.numeric(CleanBaseballData$RAA)
+CleanBaseballData$WAAWP <- as.numeric(CleanBaseballData$WAAWP)
+CleanBaseballData$Weight <- as.numeric(CleanBaseballData$Weight)
+CleanBaseballData$Height <- as.numeric(CleanBaseballData$Height)
+CleanBaseballData$WRC_plus <- as.numeric(CleanBaseballData$WRC_plus)
+CleanBaseballData$BatSpeed <- as.numeric(CleanBaseballData$BatSpeed)
+
+#Turning data into numeric (without pitch)
+CleanNoPitchData$War <- as.numeric(CleanNoPitchData$War)
+CleanNoPitchData$DRTG <- as.numeric(CleanNoPitchData$DRTG)
+CleanNoPitchData$ORTG <- as.numeric(CleanNoPitchData$ORTG)
+CleanNoPitchData$WAA <- as.numeric(CleanNoPitchData$WAA)
+CleanNoPitchData$TRPG <- as.numeric(CleanNoPitchData$TRPG)
+CleanNoPitchData$ORPG <- as.numeric(CleanNoPitchData$ORPG)
+CleanNoPitchData$RAA <- as.numeric(CleanNoPitchData$RAA)
+CleanNoPitchData$WAAWP <- as.numeric(CleanNoPitchData$WAAWP)
+CleanNoPitchData$Weight <- as.numeric(CleanNoPitchData$Weight)
+CleanNoPitchData$Height <- as.numeric(CleanNoPitchData$Height)
+CleanNoPitchData$WRC_plus <- as.numeric(CleanNoPitchData$WRC_plus)
+
+
+#Creating Non-Pitcher Data
+CleanNoPitchData <- CleanBaseballData %>%
+  filter(ORTG != 0 & DRTG != 0)
+
+#Creating Non-Pitcher-Tucker Data
+CleanNoTuckerData <- CleanNoPitchData %>%
+  filter(`WRC+` != 0)
+
+#All Clean Player Data 
+CleanBaseballData
+
+#-------------------------------------------------------------------------------
+
+#Created function for using images (do not touch)
+readPNGfromURL <- function(url) {
+  temp <- tempfile()
+  download.file(url, temp, mode = "wb")
+  img <- readPNG(temp)
+  unlink(temp)
+  return(img)
+}
+
+#-------------------------------------------------------------------------------
+#Plotting
+#Relationship Between Offensive and Defensive Rating (No Pitching) (Do not touch)
+r_ORTG_DRTG <- ggplot(data = CleanNoPitchData, 
+       mapping = aes(x = DRTG, 
+                     y = ORTG)) + 
+  geom_point() +
+  labs(title = "Relationship between ORTG and DRTG", 
+       x = "Defensive Rating", 
+       y = "Offensive Rating")
+
+for (i in 1:nrow(CleanNoPitchData)) {
+  img <- readPNGfromURL(CleanNoPitchData$`Player Image File`[i])
+  
+  r_ORTG_DRTG <- r_ORTG_DRTG + annotation_raster(
+    img, 
+    xmin = CleanNoPitchData$DRTG[i] - 0.2, xmax = CleanNoPitchData$DRTG[i] + 0.2, 
+    ymin = CleanNoPitchData$ORTG[i] - 0.5, ymax = CleanNoPitchData$ORTG[i] + 0.5
+  )
+}
+
+print(r_ORTG_DRTG)
+
+#Relationship Between WAR and Offensive Rating (Do not touch)
+r_War_ORTG <- ggplot(data = CleanNoPitchData, 
+       mapping = aes(War, ORTG)) + 
+  geom_point() + 
+  labs(title = "Relationship between WAR and ORTG", 
+       x = "Wins Above Replacement", 
+       y = "Offensive Rating")
+
+for (i in 1:nrow(CleanNoPitchData)) {
+  img <- readPNGfromURL(CleanNoPitchData$`Player Image File`[i])
+  
+  r_War_ORTG <- r_War_ORTG + annotation_raster(
+    img, 
+    xmin = CleanNoPitchData$War[i] - 0.2, xmax = CleanNoPitchData$War[i] + 0.2, 
+    ymin = CleanNoPitchData$ORTG[i] - 0.4, ymax = CleanNoPitchData$ORTG[i] + 0.4
+  )
+}
+
+print(r_War_ORTG)
+
+#Relationship Between WAR and Defensive Rating (Do not touch)
+r_War_DRTG <- ggplot(data = CleanNoPitchData, 
+       mapping = aes(War, 
+                     DRTG)) +
+  geom_point() +
+  labs(title = "Relationship between WAR and DRTG", 
+       x = "Wins Above Replacement", 
+       y = "Defensive Rating")
+
+for (i in 1:nrow(CleanNoPitchData)) {
+  img <- readPNGfromURL(CleanNoPitchData$`Player Image File`[i])
+  
+  r_War_DRTG <- r_War_DRTG + annotation_raster(
+    img, 
+    xmin = CleanNoPitchData$War[i] - 0.2, xmax = CleanNoPitchData$War[i] + 0.2, 
+    ymin = CleanNoPitchData$DRTG[i] - 0.2, ymax = CleanNoPitchData$DRTG[i] + 0.2
+  )
+}
+
+print(r_War_DRTG)
+
+#Histogram Comparing WAR across Positions
+ggplot(CleanBaseballData, 
+       aes(x = Position, 
+           y = War)) + 
+  geom_boxplot(alpha = 0.6) + 
+  labs(title = "Side by Side Boxplots comparing WAR between Positions", 
+       x = "Position", 
+       y = "WAR") + 
+  theme_minimal() + 
+  theme(axis.text.x = element_text(angle = 45))
+
+#Relationship Between Weight and ORTG
+r_WHT_ORTG <- ggplot(data = CleanNoPitchData, 
+       mapping = aes(Weight, 
+                     ORTG)) +
+  geom_point()+ 
+  labs(title = "Relationship between ORTG and Weight", 
+     x = "Weight (lbs)", 
+     y = "Offensive Rating")
+
+for (i in 1:nrow(CleanNoPitchData)) {
+  img <- readPNGfromURL(CleanNoPitchData$`Player Image File`[i])
+  
+  r_WHT_ORTG <- r_WHT_ORTG + annotation_raster(
+    img, 
+    xmin = CleanNoPitchData$Weight[i] - 3.5, xmax = CleanNoPitchData$Weight[i] + 3.5, 
+    ymin = CleanNoPitchData$ORTG[i] - 0.45, ymax = CleanNoPitchData$ORTG[i] + 0.45
+  )
+}
+
+print(r_WHT_ORTG)
+
+#Relationship between Offensive Rating and WRC+
+r_ORTG_WRC <- ggplot(data = CleanNoTuckerData, 
+       mapping = aes(ORTG, 
+                     `WRC+`)) +
+  geom_point() + 
+  labs(title = "Relationship between ORTG and WRC+", 
+       x = "Offensive Rating", 
+       y = "WRC+")
+
+for (i in 1:nrow(CleanNoTuckerData)) {
+  img <- readPNGfromURL(CleanNoTuckerData$`Player Image File`[i])
+  
+  r_ORTG_WRC <- r_ORTG_WRC + annotation_raster(
+    img, 
+    xmin = CleanNoTuckerData$ORTG[i] - 0.4, xmax = CleanNoTuckerData$ORTG[i] + 0.4, 
+    ymin = CleanNoTuckerData$`WRC+`[i] - 7, ymax = CleanNoTuckerData$`WRC+`[i] + 7
+  )
+}
+
+print(r_ORTG_WRC)
+
+#-------------------------------------------------------------------------------
+#Add the images to the players points
+
+for (i in 1:nrow(CleanNoPitchData)) {
+  img <- readPNGfromURL(CleanNoPitchData$img_path[i])
+  
+  p <- p + annotation_raster(
+    img, 
+    xmin = CleanNoPitchData$War[i] - 0.2, xmax = CleanNoPitchData$War[i] + 0.2, 
+    ymin = CleanNoPitchData$ORTG[i] - 0.4, ymax = CleanNoPitchData$ORTG[i] + 0.4
+  )
+}
+
+print(p)
+
+#-------------------------------------------------------------------------------
+#Add Player Labels
+
+geom_text_repel(aes(label = Player), size = 4, box.padding = 0.5, max.overlaps = 20)
+
+#-------------------------------------------------------------------------------
