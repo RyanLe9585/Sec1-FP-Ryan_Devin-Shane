@@ -1,0 +1,758 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.5.57">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>Baseball War</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+</style>
+
+
+<script src="Baseball War Quarto_files/libs/clipboard/clipboard.min.js"></script>
+<script src="Baseball War Quarto_files/libs/quarto-html/quarto.js"></script>
+<script src="Baseball War Quarto_files/libs/quarto-html/popper.min.js"></script>
+<script src="Baseball War Quarto_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="Baseball War Quarto_files/libs/quarto-html/anchor.min.js"></script>
+<link href="Baseball War Quarto_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="Baseball War Quarto_files/libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="Baseball War Quarto_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="Baseball War Quarto_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="Baseball War Quarto_files/libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+
+
+</head>
+
+<body class="fullcontent">
+
+<div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
+
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Baseball War</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<section id="baseball-war" class="level1">
+<h1>Baseball War</h1>
+<section id="goals" class="level3">
+<h3 class="anchored" data-anchor-id="goals">Goals</h3>
+<p>Using various, reliable data sources (ESPN, MLB.com, Baseball Savant, Baseball Reference, and FanGraphs), we wanted to use important stats and weigh them against WAR (wins above replacement) to see if there is any correlation, strong or weak.&nbsp;</p>
+<p>We will take the top 35 batters and 25 pitchers in WAR (since they are better separated). Using these separate groups, we will use important player stats, and see if they have a strong relationship with WAR and each other.</p>
+<p>One insight that we had was we figured out how to import images and use them on plots and graphs.&nbsp;</p>
+<p>The challenges that we faced was figuring out how to load the data using an HTML and also how to slice, filter, and re-label a data set.&nbsp;&nbsp;</p>
+</section>
+<section id="our-variables" class="level3">
+<h3 class="anchored" data-anchor-id="our-variables">Our Variables</h3>
+<p>WAR: Wins Above Replacement (how impactful a player is to their team)</p>
+<p>ORTG: Offensive Rating (how good the player is on offense)</p>
+<p>DRTG: Defensive Rating (how good the player is on defense)</p>
+<p>WRC+: Weighted Runs Created + (hitting rating across different eras and ballparks using adjusted offensive production)</p>
+<p>ERA: Earned Run Average (the estimated runs allowed for a pitcher in a game)</p>
+<p>FIP: Fielding Independent Pitching (estimates a pitchers run prevention independent of the defense)</p>
+<p>Age: Player Age (years)</p>
+<p>Positions: Player Position (First Base, Second Base, Shortstop, etc.)</p>
+<p>Weight: Player Weight (lbs)</p>
+<p>Height; Player height (in)</p>
+</section>
+<section id="our-data" class="level2">
+<h2 class="anchored" data-anchor-id="our-data">Our Data</h2>
+<section id="hittingfielding" class="level3">
+<h3 class="anchored" data-anchor-id="hittingfielding">Hitting/Fielding</h3>
+<div class="cell">
+<div class="cell-output cell-output-stderr">
+<pre><code>
+Attaching package: 'dplyr'</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>The following objects are masked from 'package:stats':
+
+    filter, lag</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>The following objects are masked from 'package:base':
+
+    intersect, setdiff, setequal, union</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: package 'ggrepel' was built under R version 4.3.3</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 6 × 10
+  X1    X2               X3    X4    X5    X6    X7    X8    X9    X10  
+  &lt;chr&gt; &lt;chr&gt;            &lt;chr&gt; &lt;chr&gt; &lt;chr&gt; &lt;chr&gt; &lt;chr&gt; &lt;chr&gt; &lt;chr&gt; &lt;chr&gt;
+1 1     Aaron Judge      10.8  11.7  -0.9  8.6   5     4.4   85.7  0.6  
+2 2     Bobby Witt Jr.   9.4   9.2   1.2   7.2   4.8   4.4   69.6  0.5  
+3 3     Shohei Ohtani    9.2   9.2   -1.7  7.1   4.9   4.5   70.3  0.5  
+4 4     Gunnar Henderson 9.1   8.5   1.5   6.9   4.8   4.4   66.3  0.5  
+5 5     Jarren Duran     8.7   6.2   2.5   6.5   4.6   4.4   61.3  0.5  
+6 6     Juan Soto        7.9   7.9   -0.5  5.8   4.7   4.4   55.6  0.5  </code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code> [1] "X1"  "X2"  "X3"  "X4"  "X5"  "X6"  "X7"  "X8"  "X9"  "X10"</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>tibble [50 × 10] (S3: tbl_df/tbl/data.frame)
+ $ Rank  : chr [1:50] "1" "2" "3" "4" ...
+ $ Player: chr [1:50] "A. Judge" "B. Witt Jr" "S. Ohtani" "G. Henderson" ...
+ $ War   : chr [1:50] "10.8" "9.4" "9.2" "9.1" ...
+ $ ORTG  : chr [1:50] "11.7" "9.2" "9.2" "8.5" ...
+ $ DRTG  : chr [1:50] "-0.9" "1.2" "-1.7" "1.5" ...
+ $ WAA   : chr [1:50] "8.6" "7.2" "7.1" "6.9" ...
+ $ TRPG  : chr [1:50] "5" "4.8" "4.9" "4.8" ...
+ $ ORPG  : chr [1:50] "4.4" "4.4" "4.5" "4.4" ...
+ $ RAA   : chr [1:50] "85.7" "69.6" "70.3" "66.3" ...
+ $ WAAWP : chr [1:50] "0.6" "0.5" "0.5" "0.5" ...</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "character"</code></pre>
+</div>
+</div>
+</section>
+<section id="pitching" class="level3">
+<h3 class="anchored" data-anchor-id="pitching">Pitching</h3>
+</section>
+<section id="creating-a-image-file-reading-function" class="level3">
+<h3 class="anchored" data-anchor-id="creating-a-image-file-reading-function">Creating a Image File Reading Function</h3>
+</section>
+</section>
+<section id="player-hittingfielding-relationships" class="level2">
+<h2 class="anchored" data-anchor-id="player-hittingfielding-relationships">Player Hitting/Fielding Relationships</h2>
+<section id="war-v.-ortg" class="level3">
+<h3 class="anchored" data-anchor-id="war-v.-ortg">War v. ORTG</h3>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Baseball-War-Quarto_files/figure-html/unnamed-chunk-4-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>In the Graph, we can see that there is a defined positive relationship between WAR and ORTG. This tells us that the players that excel at offense, typically will be more impactful to their team.&nbsp;</p>
+</section>
+<section id="war-v.-drtg" class="level3">
+<h3 class="anchored" data-anchor-id="war-v.-drtg">War v. DRTG</h3>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Baseball-War-Quarto_files/figure-html/unnamed-chunk-5-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>In the Graph, we can see that there is a rough, slightly negative relationship, or no clear relationship, between WAR and DRTG. This tells us that the players that excel at defense aren’t confirmed to have a high WAR.&nbsp;</p>
+</section>
+<section id="ortg-v.-drtg" class="level3">
+<h3 class="anchored" data-anchor-id="ortg-v.-drtg">ORTG v. DRTG</h3>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Baseball-War-Quarto_files/figure-html/unnamed-chunk-6-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>In the Graph, we can see that there is a slight negative relationship between ORTG and DRTG. This tells us that the players that excel at offense, typically are not the greatest defenders, and vice versa.&nbsp;</p>
+</section>
+<section id="other-relationships-that-could-help-predict-war" class="level3">
+<h3 class="anchored" data-anchor-id="other-relationships-that-could-help-predict-war">Other Relationships that could help predict WAR</h3>
+<section id="ortg-v.-player-weight" class="level4">
+<h4 class="anchored" data-anchor-id="ortg-v.-player-weight">ORTG v. Player Weight</h4>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Baseball-War-Quarto_files/figure-html/unnamed-chunk-7-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>When looking at the relationship between player weight and ORTG, we can see that you could make the case for a positive relationship. That would mean, the heavier you are, the better offensive stats you put up.&nbsp;</p>
+</section>
+<section id="ortg-v.-wrc" class="level4">
+<h4 class="anchored" data-anchor-id="ortg-v.-wrc">ORTG v. WRC+</h4>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Baseball-War-Quarto_files/figure-html/unnamed-chunk-8-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>We can see that WRC+ and ORTG have a very strong, positive relationship. This means that WRC+ is a good predictor for WAR.&nbsp;</p>
+<p>Kyle Tucker was filtered out of this plot due to him not being eligible for WRC+ (not enough at bats).</p>
+</section>
+</section>
+</section>
+<section id="pitching-relationships" class="level2">
+<h2 class="anchored" data-anchor-id="pitching-relationships">Pitching Relationships</h2>
+<section id="war-v.-era" class="level3">
+<h3 class="anchored" data-anchor-id="war-v.-era">War v. ERA</h3>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Baseball-War-Quarto_files/figure-html/unnamed-chunk-9-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>In the Graph, we see a steep negative correlation, players who have high WAR usually have low (sub 3) ERA.&nbsp;</p>
+<p>ERA is the amount of earned runs allowed by a pitcher per 9 innings.</p>
+</section>
+<section id="war-v.-fip" class="level3">
+<h3 class="anchored" data-anchor-id="war-v.-fip">War v. FIP</h3>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Baseball-War-Quarto_files/figure-html/unnamed-chunk-10-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>In the Graph, we can conclude that WAR and FIP have a weak negative correlation. This means that a dominant pitcher in the MLB, who has a high WAR, will tend to have a low FIP.</p>
+<p>FIP is similar to ERA, but it keeps the defensive performance of the pitchers team constant, so this is a specific stat that track the individual performance of the pitcher. (only strikes, walks, and home runs allowed).</p>
+</section>
+<section id="era-v.-fip" class="level3">
+<h3 class="anchored" data-anchor-id="era-v.-fip">ERA v. FIP</h3>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Baseball-War-Quarto_files/figure-html/unnamed-chunk-11-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>In the Graph, we can see that there is a nice positive correlation between ERA and FIP. Pitchers want to aim for having low values in both stats values.&nbsp;</p>
+<p>The ERA of an average pitcher is around 3.50.</p>
+<p>The FIP of an average pitcher is around 4.25.</p>
+</section>
+<section id="other-relationships-that-could-predict-war" class="level3">
+<h3 class="anchored" data-anchor-id="other-relationships-that-could-predict-war">Other Relationships that could predict WAR</h3>
+<section id="fip-v.-age" class="level4">
+<h4 class="anchored" data-anchor-id="fip-v.-age">FIP v. Age</h4>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Baseball-War-Quarto_files/figure-html/unnamed-chunk-12-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Even though it does look like there is slight correlation between Age and FIP, there is no specific age range where a pitcher is dominant.</p>
+<p>For example, Chris Sale (bottom right) and Paul Skenes (bottom left) are dominant pitchers (low FIP), yet they were born 13 years apart.</p>
+</section>
+<section id="fip-v.-height" class="level4">
+<h4 class="anchored" data-anchor-id="fip-v.-height">FIP v. Height</h4>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Baseball-War-Quarto_files/figure-html/unnamed-chunk-13-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>There is no correlation between FIP and height, proving that you do not have to be a certain height to be an elite pitcher. However, the best-of-the-best pitchers, historically, tend to be taller.&nbsp;</p>
+<p>The reason people say taller is better is because the taller you are, the harder you throw, which makes you harder to hit. Also high release points make for difficulty to predict a pitch.</p>
+</section>
+</section>
+<section id="war-v.-position" class="level3">
+<h3 class="anchored" data-anchor-id="war-v.-position">War v. Position</h3>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Baseball-War-Quarto_files/figure-html/unnamed-chunk-14-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Looking at the Side-by-Side Boxplots, we can conclude that position’s don’t determine WAR. So, a player can have a good WAR regardless of position.&nbsp;</p>
+<p>The reason some interquartile ranges are bigger than others is solely due to sample size.&nbsp;</p>
+</section>
+</section>
+</section>
+<section id="conclusion" class="level1">
+<h1>Conclusion</h1>
+<section id="hitterfield-players" class="level2">
+<h2 class="anchored" data-anchor-id="hitterfield-players">Hitter/Field Players</h2>
+<p>WAR looks to be heavily influenced by the offensive production of a player, as shown by the heavy, positive correlation between WAR and Offensive rating.&nbsp;</p>
+<p>We also see that, as important of a stat defensive rating is, it doesn’t contribute that much, with little to no correlation between itself and WAR.</p>
+<p>Lastly, we see that there is a negative correlation between Offensive and Defensive rating, which tells us that if you’re good at offense, you might not be the greatest defender, and vice versa (with a few exceptions).&nbsp;</p>
+</section>
+<section id="pitchers" class="level2">
+<h2 class="anchored" data-anchor-id="pitchers">Pitchers</h2>
+<p>WAR looks to have a negative correlation with both ERA and FIP, meaning the pitchers with high WAR tend to have lower ERA’s and FIP’s.</p>
+<p>We also see ERA and FIP have a strong positive correlation. This tells us that as your ERA gets worse (increases), your FIP will also get worse (increase).</p>
+<p>Lastly, we see that height and age aren’t really a factor in the performance of a pitcher, just a physical attribute.&nbsp;</p>
+<p><br>
+</p>
+<p>The <code>echo: false</code> option disables the printing of code (only output is displayed).</p>
+</section>
+</section>
+
+</main>
+<!-- /main column -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const onCopySuccess = function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  }
+  const getTextToCopy = function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+    text: getTextToCopy
+  });
+  clipboard.on('success', onCopySuccess);
+  if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+    // For code content inside modals, clipBoardJS needs to be initialized with a container option
+    // TODO: Check when it could be a function (https://github.com/zenorocha/clipboard.js/issues/860)
+    const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+      text: getTextToCopy,
+      container: window.document.getElementById('quarto-embedded-source-code-modal')
+    });
+    clipboardModal.on('success', onCopySuccess);
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp('/' + window.location.host + '/');
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      // TODO in 1.5, we should make sure this works without a callout special case
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>
