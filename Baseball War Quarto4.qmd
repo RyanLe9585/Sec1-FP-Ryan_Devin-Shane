@@ -1,0 +1,1050 @@
+---
+title: "Baseball War"
+format: html
+editor: visual
+execute: 
+  echo: false
+---
+
+# Baseball War
+
+### Introduction
+
+The history of Baseball stats has just started to become more prominent in the 21st Century with stats like WAR, ERA, and Batting Average being the driving force to determine how great a baseball player really is. However, some of these stats can be somewhat misleading, causing you to believe that a player is a lot better than he actually is, and vice versa.
+
+In our report, we will answer the question: What major baseball stats are the most crucial for predicting WAR? We will compare various stats to players WAR (wins above replacement), so see which stats significantly benefit and help to prove a players importance. Also, we will be comparing physical player attributes (height, weight and age) to see if it has any influence as well.
+
+In this report, you will see some of our process of collecting our data, the comparisons of stats and an explanation of how they apply to all of baseball, and what conclusions we have from the graphs and plot we created.
+
+### Information about our project
+
+We used various, reliable data sources (ESPN, MLB.com, Baseball Savant, Baseball Reference, and FanGraphs) to get accurate and reliabe data for our plots. We wanted to use important stats and weigh them against WAR (wins above replacement) to see if there is any correlation, strong or weak. 
+
+For our data frame, we will take the top 35 batters and 25 pitchers in WAR (since they are better separated) (once you go past our samples sizes for players, the wars are very similar, so the data would start to skew). Using these separate groups, we will use important player stats, and see if they have a strong relationship with WAR and each other. Lastly, we compared the significance of WAR across positions to see if there is any correlation.
+
+One insight that we had was we figured out how to import images and use them on plots and graphs. This was a big advancement for us because it makes the graphs less cluttered and more interesting to look at. This feature also helps to make it easier to assign a face to a better player.
+
+The challenges that we faced was figuring out how to load the data using an HTML and also how to slice, filter, and re-label a data set. Another thing that was challenging was to put a player label for a specific player. Unfortunately, we could not figure out how to make this work, so we pointed out these players specifically in our descriptions and also added labels and images in post in our presentation.
+
+Just to add a little more information about our code, we made sure that it was accessible and easy to understand so that the code is easy to read and reproducible. Also, since the data is strictly baseball numbers, there are no biases in the data, only correct baseball data and isn’t considered sensitive. Finally, we made sure that our code is clean, and made some guidelines which explains to the user how certain areas in the code work. This allows other people to easily modify it and add anything they need to. In addition, to make this process easier sharing the code is very simple. The only difficult part of our code is the process to import images, since we had to create our own function, but outside of that, every other chunk of code can be accessed using common packages
+
+### Our Variables
+
+WAR: Wins Above Replacement (how impactful a player is to their team)
+
+ORTG: Offensive Rating (how good the player is on offense)
+
+DRTG: Defensive Rating (how good the player is on defense)
+
+WRC+: Weighted Runs Created + (hitting rating across different eras and ballparks using adjusted offensive production)
+
+ERA: Earned Run Average (the estimated runs allowed for a pitcher in a game)
+
+FIP: Fielding Independent Pitching (estimates a pitchers run prevention independent of the defense)
+
+Age: Player Age (years)
+
+Positions: Player Position (First Base, Second Base, Shortstop, etc.)
+
+Weight: Player Weight (lbs)
+
+Height; Player height (in)
+
+## Our Data
+
+### Hitting/Fielding
+
+In our Hitting/Fielding Data, we originally drew from the top 50 baseball players in WAR, according to ESPN. We then filtered down the data to just get the top field players (sample size of 35). In addition to the stats that were already in the table we got from ESPN, we added Height and Weight (Baseball Reference), WRC+ (Fan Graphs), and Bat Speed (Fan Graphs). We also added positions for the players for the final graph of comparing WAR across positions. Next, we added a img_path column into the table so that we could use PNG's of the players for our graphs. To further clean the data, we had to make the values numeric to use in the graphs. Finally, we had to make one adjustment for a data set since Kyle Tucker didn't meet and at bat requirement for FIP, so there is a data set that doesn't include him.
+
+```{r}
+library(rvest)
+library(dplyr)
+library(ggplot2)
+library(png)
+library(grid)
+library(ggrepel)
+library(ggforce)
+
+#Open Data through HTML
+Baseball_data <- read_html("https://www.espn.com/mlb/war/leaders")
+#Open table of data 
+table_data <- Baseball_data %>%
+  html_nodes("table") %>%
+  html_table(fill = TRUE)
+#Get to table
+table1 <- table_data[[1]]
+
+#-------------------------------------------------------------------------------
+
+#Clean the data
+CleanBaseballData <- table1 %>%
+  slice(-1, -2)
+
+head(CleanBaseballData)
+names(CleanBaseballData) 
+colnames(CleanBaseballData) <- c("Rank", "Player", "War", "ORTG", "DRTG", "WAA", 
+                                 "TRPG", "ORPG", "RAA", "WAAWP")
+
+CleanBaseballData$Player <- c("A. Judge",
+                              "B. Witt Jr", 
+                              "S. Ohtani", 
+                              "G. Henderson", 
+                              "J. Duran", 
+                              "J. Soto", 
+                              "M. Chapman",
+                              "F. Lindor", 
+                              "J. Ramirez", 
+                              "K. Marte", 
+                              "T. Skubal",
+                              "H. Greene", 
+                              "C. Sale", 
+                              "V. Guerrero Jr", 
+                              "Z. Wheeler",
+                              "P. Skenes", 
+                              "E. Fedde", 
+                              "B. Rooker", 
+                              "R. Greene",
+                              "Y. Alvarez", 
+                              "S. Lugo", 
+                              "E. De La Cruz", 
+                              "Z. Neto",
+                              "R. Lopez", 
+                              "D. Varsho", 
+                              "C. Seager", 
+                              "C. Ragans",
+                              "M. Winn", 
+                              "W. Contreras", 
+                              "B. Harper", 
+                              "M. Betts", 
+                              "K. Tucker", 
+                              "F. Freeman", 
+                              "C. Raleigh",
+                              "B. Turang", 
+                              "F. Valdez", 
+                              "E. Clase", 
+                              "R. Blanco",
+                              "J. Merrill", 
+                              "M. Ozuna", 
+                              "J. Rodriguez", 
+                              "T. Hernandez",
+                              "D. Cease", 
+                              "G. Crochet", 
+                              "A. Bregman", 
+                              "M. Semien",
+                              "M. King", 
+                              "J. Pena", 
+                              "B. Doyle", 
+                              "A. Gimenez"
+)
+
+str(CleanBaseballData)
+
+#Add Player Positions
+CleanBaseballData$Position <- c("Outfield", #Judge
+                                "Shortstop", #Witt Jr
+                                "Designated Hitter", #Ohtani
+                                "Shortstop", #Henderson
+                                "Outfield", #Duran
+                                "Outfield", #Soto
+                                "Third Base", #Chapman
+                                "Shortstop", #Lindor
+                                "Third Base", #Ramirez
+                                "Second Base", #Marte
+                                "Pitcher", #Skubal
+                                "Pitcher", #H. Greene
+                                "Pitcher", #Sale
+                                "First Base", #Vlad Jr
+                                "Pitcher", #Wheeler
+                                "Pitcher", #Skenes
+                                "Pitcher", #Fedde
+                                "Designated Hitter", #Rooker
+                                "Outfield", #R. Greene
+                                "Designated Hitter", #Alvarez
+                                "Pitcher", #Lugo
+                                "Shortstop", #De La Cruz
+                                "Shortstop", #Neto
+                                "Pitcher", #Lopez
+                                "Outfield", #Varsho
+                                "Shortstop", #Seager
+                                "Pitcher", #Ragans
+                                "Shortstop", #Winn
+                                "Catcher", #Contreras
+                                "First Base", #Harper
+                                "Shortstop", #Betts
+                                "Outfield", #Tucker
+                                "First Base", #Freeman
+                                "Catcher", #Raleigh
+                                "Second Base", #Turang
+                                "Pitcher", #Valdez
+                                "Pitcher", #Clase
+                                "Pitcher", #Banco
+                                "Outfield", #Merrill
+                                "Designated Hitter", #Ozuna
+                                "Outfield", #Rodriguez
+                                "Outfield", #Hernandez
+                                "Pitcher", #Cease
+                                "Pitcher", #Crochet
+                                "Third Base", #Bregman
+                                "Second Base", #Semien
+                                "Pitcher", #King
+                                "Shortstop", #Pena
+                                "Outfield", #Doyle
+                                "Second Base" #Gimenez
+)
+
+#Add player weight
+CleanBaseballData$Weight <- c("282", #Judge
+                                "200", #Witt Jr
+                                "209", #Ohtani
+                                "220", #Henderson
+                                "212", #Duran
+                                "224", #Soto
+                                "215", #Chapman
+                                "190", #Lindor
+                                "190", #Ramirez
+                                "210", #Marte
+                                "240", #Skubal
+                                "242", #H. Greene
+                                "180", #Sale
+                                "245", #Vlad Jr
+                                "195", #Wheeler
+                                "235", #Skenes
+                                "205", #Fedde
+                                "225", #Rooker
+                                "200", #R. Greene
+                                "237", #Alvarez
+                                "225", #Lugo
+                                "200", #De La Cruz
+                                "185", #Neto
+                                "225", #Lopez
+                                "207", #Varsho
+                                "215", #Seager
+                                "190", #Ragans
+                                "185", #Winn
+                                "212", #Contreras
+                                "210", #Harper
+                                "180", #Betts
+                                "212", #Tucker
+                                "220", #Freeman
+                                "235", #Raleigh
+                                "188", #Turang
+                                "230", #Valdez
+                                "206", #Clase
+                                "265", #Banco
+                                "195", #Merrill
+                                "225", #Ozuna
+                                "228", #Rodriguez
+                                "215", #Hernandez
+                                "200", #Cease
+                                "245", #Crochet
+                                "190", #Bregman
+                                "195", #Semien
+                                "210", #King
+                                "202", #Pena
+                                "220", #Doyle
+                                "161" #Gimenez
+)
+
+#Add player height
+CleanBaseballData$Height <- c("79", #Judge
+                              "73", #Witt Jr
+                              "76", #Ohtani
+                              "75", #Henderson
+                              "74", #Duran
+                              "74", #Soto
+                              "72", #Chapman
+                              "71", #Lindor
+                              "69", #Ramirez
+                              "73", #Marte
+                              "75", #Skubal
+                              "76", #H. Greene
+                              "78", #Sale
+                              "74", #Vlad Jr
+                              "76", #Wheeler
+                              "76", #Skenes
+                              "74", #Fedde
+                              "75", #Rooker
+                              "75", #R. Greene
+                              "77", #Alvarez
+                              "76", #Lugo
+                              "77", #De La Cruz
+                              "70", #Neto
+                              "71", #Lopez
+                              "68", #Varsho
+                              "76", #Seager
+                              "76", #Ragans
+                              "71", #Winn
+                              "71", #Contreras
+                              "75", #Harper
+                              "69", #Betts
+                              "76", #Tucker
+                              "77", #Freeman
+                              "75", #Raleigh
+                              "72", #Turang
+                              "71", #Valdez
+                              "74", #Clase
+                              "75", #Banco
+                              "75", #Merrill
+                              "73", #Ozuna
+                              "75", #Rodriguez
+                              "74", #Hernandez
+                              "74", #Cease
+                              "78", #Crochet
+                              "72", #Bregman
+                              "72", #Semien
+                              "75", #King
+                              "72", #Pena
+                              "76", #Doyle
+                              "71" #Gimenez
+)
+
+#All WRC+
+CleanBaseballData$WRC_plus <- c("218", #Judge
+                                "168", #Witt Jr
+                                "181", #Ohtani
+                                "155", #Henderson
+                                "129", #Duran
+                                "180", #Soto
+                                "121", #Chapman
+                                "137", #Lindor
+                                "141", #Ramirez
+                                "151", #Marte
+                                "0", #Skubal
+                                "0", #H. Greene
+                                "0", #Sale
+                                "165", #Vlad Jr
+                                "0", #Wheeler
+                                "0", #Skenes
+                                "0", #Fedde
+                                "164", #Rooker
+                                "135", #R. Greene
+                                "168", #Alvarez
+                                "0", #Lugo
+                                "118", #De La Cruz
+                                "114", #Neto
+                                "0", #Lopez
+                                "99", #Varsho
+                                "140", #Seager
+                                "0", #Ragans
+                                "103", #Winn
+                                "131", #Contreras
+                                "145", #Harper
+                                "141", #Betts
+                                "0", #Tucker
+                                "137", #Freeman
+                                "117", #Raleigh
+                                "87", #Turang
+                                "0", #Valdez
+                                "0", #Clase
+                                "0", #Banco
+                                "130", #Merrill
+                                "154", #Ozuna
+                                "116", #Rodriguez
+                                "134", #Hernandez
+                                "0", #Cease
+                                "0", #Crochet
+                                "118", #Bregman
+                                "99", #Semien
+                                "0", #King
+                                "100", #Pena
+                                "97", #Doyle
+                                "83" #Gimenez
+)
+
+#Add Bat Speed (competitive swings)
+CleanBaseballData$BatSpeed <- c("77.2", #Judge
+                                "74.7", #Witt Jr
+                                "76.3", #Ohtani
+                                "76.3", #Henderson
+                                "73.6", #Duran
+                                "75.5", #Soto
+                                "76.6", #Chapman
+                                "72.3", #Lindor
+                                "71.6", #Ramirez
+                                "73.7", #Marte
+                                "0", #Skubal
+                                "0", #H. Greene
+                                "0", #Sale
+                                "75.9", #Vlad Jr
+                                "0", #Wheeler
+                                "0", #Skenes
+                                "0", #Fedde
+                                "73.7", #Rooker
+                                "74.6", #R. Greene
+                                "76.6", #Alvarez
+                                "0", #Lugo
+                                "75.2", #De La Cruz
+                                "71.0", #Neto
+                                "0", #Lopez
+                                "73.7", #Varsho
+                                "72.3", #Seager
+                                "0", #Ragans
+                                "70.2", #Winn
+                                "74.7", #Contreras
+                                "74.1", #Harper
+                                "69.1", #Betts
+                                "0", #Tucker
+                                "69.8", #Freeman
+                                "74.5", #Raleigh
+                                "66.2", #Turang
+                                "0", #Valdez
+                                "0", #Clase
+                                "0", #Banco
+                                "72.2", #Merrill
+                                "74.0", #Ozuna
+                                "76.3", #Rodriguez
+                                "73.3", #Hernandez
+                                "0", #Cease
+                                "0", #Crochet
+                                "71.4", #Bregman
+                                "68.3", #Semien
+                                "0", #King
+                                "72.6", #Pena
+                                "70.9", #Doyle
+                                "68.2" #Gimenez
+)
+
+
+
+#Add player pictures
+CleanBaseballData$img_path <- c(
+  "https://a.espncdn.com/combiner/i?img=/i/headshots/mlb/players/full/33192.png", #Judge
+  "https://a.espncdn.com/combiner/i?img=/i/headshots/mlb/players/full/42403.png", #Witt Jr
+  "https://a.espncdn.com/combiner/i?img=/i/headshots/mlb/players/full/39832.png", #Ohtani
+  "https://a.espncdn.com/combiner/i?img=/i/headshots/mlb/players/full/42507.png", #Henderson
+  "https://a.espncdn.com/combiner/i?img=/i/headshots/mlb/players/full/41610.png", #Duran
+  "https://a.espncdn.com/combiner/i?img=/i/headshots/mlb/players/full/36969.png", #Soto
+  "https://a.espncdn.com/combiner/i?img=/i/headshots/mlb/players/full/33857.png", #Chapman
+  "https://a.espncdn.com/combiner/i?img=/i/headshots/mlb/players/full/32129.png", #Lindor
+  "https://a.espncdn.com/combiner/i?img=/i/headshots/mlb/players/full/32801.png&w=350&h=254", #Ramirez
+  "https://a.espncdn.com/combiner/i?img=/i/headshots/mlb/players/full/32512.png", #Marte
+  "https://a.espncdn.com/combiner/i?img=/i/headshots/mlb/players/full/42409.png", #Skubal
+  "https://a.espncdn.com/combiner/i?img=/i/headshots/mlb/players/full/39635.png", #H. Greene
+  "https://a.espncdn.com/combiner/i?img=/i/headshots/mlb/players/full/30948.png", #Sale
+  "https://a.espncdn.com/i/headshots/mlb/players/full/35002.png", #Vlad Jr
+  "https://a.espncdn.com/combiner/i?img=/i/headshots/mlb/players/full/31267.png", #Wheeler
+  "https://a.espncdn.com/i/headshots/mlb/players/full/4719507.png", #Skenes
+  "https://a.espncdn.com/combiner/i?img=/i/headshots/mlb/players/full/33793.png", #Fedde
+  "https://a.espncdn.com/combiner/i?img=/i/headshots/mlb/players/full/40926.png", #Rooker
+  "https://a.espncdn.com/combiner/i?img=/i/headshots/mlb/players/full/42179.png", #R. Greene
+  "https://a.espncdn.com/combiner/i?img=/i/headshots/mlb/players/full/36018.png", #Alvarez
+  "https://a.espncdn.com/combiner/i?img=/i/headshots/mlb/players/full/34873.png", #Lugo
+  "https://a.espncdn.com/combiner/i?img=/i/headshots/mlb/players/full/4917694.png", #De La Cruz
+  "https://a.espncdn.com/combiner/i?img=/i/headshots/mlb/players/full/4666100.png", #Neto
+  "https://a.espncdn.com/i/headshots/mlb/players/full/33860.png", #Lopez
+  "https://a.espncdn.com/combiner/i?img=/i/headshots/mlb/players/full/40963.png", #Varsho
+  "https://a.espncdn.com/combiner/i?img=/i/headshots/mlb/players/full/32691.png", #Seager
+  "https://a.espncdn.com/combiner/i?img=/i/headshots/mlb/players/full/41054.png&w=350&h=254", #Ragans
+  "https://a.espncdn.com/combiner/i?img=/i/headshots/mlb/players/full/4683365.png", #Winn
+  "https://a.espncdn.com/combiner/i?img=/i/headshots/mlb/players/full/39895.png", #Contreras
+  "https://a.espncdn.com/combiner/i?img=/i/headshots/mlb/players/full/30951.png", #Harper
+  "https://a.espncdn.com/combiner/i?img=/i/headshots/mlb/players/full/33039.png", #Betts
+  "https://a.espncdn.com/combiner/i?img=/i/headshots/mlb/players/full/34967.png", #Tucker
+  "https://a.espncdn.com/combiner/i?img=/i/headshots/mlb/players/full/30193.png", #Freeman
+  "https://a.espncdn.com/combiner/i?img=/i/headshots/mlb/players/full/41292.png&w=350&h=254", #Raleigh
+  "https://a.espncdn.com/combiner/i?img=/i/headshots/mlb/players/full/41179.png", #Turang
+  "https://a.espncdn.com/combiner/i?img=/i/headshots/mlb/players/full/36581.png", #Valdez
+  "https://a.espncdn.com/combiner/i?img=/i/headshots/mlb/players/full/41743.png", #Clase
+  "https://a.espncdn.com/combiner/i?img=/i/headshots/mlb/players/full/41829.png", #Banco
+  "https://a.espncdn.com/combiner/i?img=/i/headshots/mlb/players/full/4872691.png", #Merrill
+  "https://a.espncdn.com/combiner/i?img=/i/headshots/mlb/players/full/31668.png", #Ozuna
+  "https://a.espncdn.com/combiner/i?img=/i/headshots/mlb/players/full/41044.png", #Rodriguez
+  "https://a.espncdn.com/combiner/i?img=/i/headshots/mlb/players/full/33377.png", #Hernandez
+  "https://a.espncdn.com/combiner/i?img=/i/headshots/mlb/players/full/34943.png", #Cease
+  "https://a.espncdn.com/combiner/i?img=/i/headshots/mlb/players/full/4297835.png", #Crochet
+  "https://a.espncdn.com/combiner/i?img=/i/headshots/mlb/players/full/34886.png&w=350&h=254", #Bregman
+  "https://a.espncdn.com/combiner/i?img=/i/headshots/mlb/players/full/32146.png", #Semien
+  "https://a.espncdn.com/combiner/i?img=/i/headshots/mlb/players/full/40429.png", #King
+  "https://a.espncdn.com/combiner/i?img=/i/headshots/mlb/players/full/41273.png", #Pena
+  "https://a.espncdn.com/combiner/i?img=/i/headshots/mlb/players/full/42462.png", #Doyle
+  "https://a.espncdn.com/combiner/i?img=/i/headshots/mlb/players/full/37729.png" #Gimenez
+  )
+class(CleanBaseballData$War)
+
+#Creating Non-Pitcher Data
+CleanNoPitchData <- CleanBaseballData %>%
+  filter(ORTG != 0 & DRTG != 0)
+
+#Turning data into numeric (with pitch)
+CleanBaseballData$War <- as.numeric(CleanBaseballData$War)
+CleanBaseballData$DRTG <- as.numeric(CleanBaseballData$DRTG)
+CleanBaseballData$ORTG <- as.numeric(CleanBaseballData$ORTG)
+CleanBaseballData$WAA <- as.numeric(CleanBaseballData$WAA)
+CleanBaseballData$TRPG <- as.numeric(CleanBaseballData$TRPG)
+CleanBaseballData$ORPG <- as.numeric(CleanBaseballData$ORPG)
+CleanBaseballData$RAA <- as.numeric(CleanBaseballData$RAA)
+CleanBaseballData$WAAWP <- as.numeric(CleanBaseballData$WAAWP)
+CleanBaseballData$Weight <- as.numeric(CleanBaseballData$Weight)
+CleanBaseballData$Height <- as.numeric(CleanBaseballData$Height)
+CleanBaseballData$WRC_plus <- as.numeric(CleanBaseballData$WRC_plus)
+CleanBaseballData$BatSpeed <- as.numeric(CleanBaseballData$BatSpeed)
+
+#Turning data into numeric (without pitch)
+CleanNoPitchData$War <- as.numeric(CleanNoPitchData$War)
+CleanNoPitchData$DRTG <- as.numeric(CleanNoPitchData$DRTG)
+CleanNoPitchData$ORTG <- as.numeric(CleanNoPitchData$ORTG)
+CleanNoPitchData$WAA <- as.numeric(CleanNoPitchData$WAA)
+CleanNoPitchData$TRPG <- as.numeric(CleanNoPitchData$TRPG)
+CleanNoPitchData$ORPG <- as.numeric(CleanNoPitchData$ORPG)
+CleanNoPitchData$RAA <- as.numeric(CleanNoPitchData$RAA)
+CleanNoPitchData$WAAWP <- as.numeric(CleanNoPitchData$WAAWP)
+CleanNoPitchData$Weight <- as.numeric(CleanNoPitchData$Weight)
+CleanNoPitchData$Height <- as.numeric(CleanNoPitchData$Height)
+CleanNoPitchData$WRC_plus <- as.numeric(CleanNoPitchData$WRC_plus)
+
+#Creating Non-Pitcher-Tucker Data
+CleanNoTuckerData <- CleanNoPitchData %>%
+  filter(WRC_plus != 0)
+```
+
+### Pitching
+
+In our Pitching Data, we drew from the top 25 baseball players in WAR, according to ESPN, since the remaining 15 pitchers in the top 50 didn't seem like enough for proper graphing. We then filtered down the data to clean the table and rename columns. We added a couple stats to our table: FIP (Fan graphs), age and height (Baseball Reference). And, like the hitting data, we added an img_path column for player PNG images to use in our graphs. We also, had to make the data numeric, like the hitting data, for the values to be used in plots.
+
+```{r}
+library(rvest)
+library(dplyr)
+library(ggplot2)
+library(png)
+library(grid)
+library(ggrepel)
+library(ggforce)
+
+#Open Data through HTML
+Baseball_data_Pitch <- read_html("https://www.espn.com/mlb/war/leaders/_/type/pitching/mlb/war/leaders")
+#Open table of data 
+table_data_pitch <- Baseball_data_Pitch %>%
+  html_nodes("table") %>%
+  html_table(fill = TRUE)
+#Get to table
+table1_pitch <- table_data_pitch[[1]]
+
+#-------------------------------------------------------------------------------
+
+CleanPitchData <- table1_pitch %>%
+  slice(1:27)
+
+CleanPitchData <- CleanPitchData %>%
+  slice(-1, -2)
+
+colnames(CleanPitchData) <- c("Rank", "Player", "War", "RA", "RAR", "WAA", 
+                                 "WAAWP", "ORPG", "BIP", "PFF")
+
+CleanPitchData$Player <- c("T. Skubal",
+                              "H. Greene",
+                              "C. Sale",
+                              "Z. Wheeler",
+                              "P. Skenes",
+                              "E. Fedde",
+                              "S. Lugo",
+                              "R. Lopez",
+                              "C. Ragans",
+                              "F. Valdez",
+                              "E. Clase",
+                              "R. Blanco",
+                              "D. Cease",
+                              "G. Crochet",
+                              "M. King",
+                              "N. Martinez",
+                              "T. Scott",
+                              "L. Webb",
+                              "A. Nola",
+                              "T. Houck",
+                              "M. Wacha",
+                              "M. Fried",
+                              "C. Burnes",
+                              "B. Miller",
+                              "C. Sanchez"
+)
+
+CleanPitchData$ERA <- c("2.39", #Skubal
+                           "2.75", #Greene
+                           "2.38", #Sale
+                           "2.57", #Wheeler
+                           "1.96", #Skenes
+                           "3.30", #Fedde
+                           "3.00", #Lugo
+                           "1.99", #Lopez
+                           "3.14", #Ragans
+                           "2.91", #Valdez
+                           "0.61", # Clase
+                           "2.80", #Blanco
+                           "3.47", #Cease
+                           "3.58", #Crochet
+                           "2.95", #King
+                           "3.10", #Martinez
+                           "1.75", #Scott
+                           "3.47", #Webb
+                           "3.57", #Nola
+                           "3.12", #Houck
+                           "3.35", #Wacha
+                           "3.25", #Fried
+                           "2.92", #Burnes
+                           "2.94", #Miller
+                           "3.32" #Sanchez
+)
+
+CleanPitchData$FIP <- c("2.49", #Skubal
+                        "3.47", #Greene
+                        "2.09", #Sale
+                        "3.13", #Wheeler
+                        "2.44", #Skenes
+                        "3.86", #Fedde
+                        "3.25", #Lugo
+                        "2.92", #Lopez
+                        "2.99", #Ragans
+                        "3.25", #Valdez
+                        "2.22", # Clase
+                        "4.15", #Blanco
+                        "3.10", #Cease
+                        "2.96", #Crochet
+                        "3.33", #King
+                        "3.21", #Martinez
+                        "2.92", #Scott
+                        "2.95", #Webb
+                        "3.94", #Nola
+                        "3.32", #Houck
+                        "3.65", #Wacha
+                        "3.33", #Fried
+                        "3.55", #Burnes
+                        "3.58", #Miller
+                        "3.00" #Sanchez
+)
+
+CleanPitchData$Age <- c("28", #Skubal
+                        "25", #Greene
+                        "35", #Sale
+                        "34", #Wheeler
+                        "22", #Skenes
+                        "31", #Fedde
+                        "35", #Lugo
+                        "30", #Lopez
+                        "26", #Ragans
+                        "31", #Valdez
+                        "26", #Clase
+                        "31", #Blanco
+                        "28", #Cease
+                        "25", #Crochet
+                        "29", #King
+                        "34", #Martinez
+                        "30", #Scott
+                        "28", #Webb
+                        "31", #Nola
+                        "28", #Houck
+                        "33", #Wacha
+                        "30", #Fried
+                        "30", #Burnes
+                        "26", #Miller
+                        "27" #Sanchez
+)
+
+CleanPitchData$Height <- c("75", #Skubal
+                        "77", #Greene
+                        "78", #Sale
+                        "76", #Wheeler
+                        "76", #Skenes
+                        "74", #Fedde
+                        "76", #Lugo
+                        "71", #Lopez
+                        "76", #Ragans
+                        "71", #Valdez
+                        "74", # Clase
+                        "75", #Blanco
+                        "74", #Cease
+                        "78", #Crochet
+                        "75", #King
+                        "73", #Martinez
+                        "72", #Scott
+                        "73", #Webb
+                        "73", #Nola
+                        "77", #Houck
+                        "78", #Wacha
+                        "76", #Fried
+                        "75", #Burnes
+                        "74", #Miller
+                        "73" #Sanchez
+)
+
+CleanPitchData$img_path <- c("https://a.espncdn.com/combiner/i?img=/i/headshots/mlb/players/full/42409.png", #Skubal
+                        "https://a.espncdn.com/combiner/i?img=/i/headshots/mlb/players/full/39635.png", #Greene
+                        "https://a.espncdn.com/combiner/i?img=/i/headshots/mlb/players/full/30948.png", #Sale
+                        "https://a.espncdn.com/i/headshots/mlb/players/full/31267.png", #Wheeler
+                        "https://a.espncdn.com/i/headshots/mlb/players/full/4719507.png", #Skenes
+                        "https://a.espncdn.com/combiner/i?img=/i/headshots/mlb/players/full/33793.png", #Fedde
+                        "https://a.espncdn.com/combiner/i?img=/i/headshots/mlb/players/full/34873.png", #Lugo
+                        "https://a.espncdn.com/i/headshots/mlb/players/full/33860.png", #Lopez
+                        "https://a.espncdn.com/combiner/i?img=/i/headshots/mlb/players/full/41054.png&w=350&h=254", #Ragans
+                        "https://a.espncdn.com/combiner/i?img=/i/headshots/mlb/players/full/36581.png", #Valdez
+                        "https://a.espncdn.com/combiner/i?img=/i/headshots/mlb/players/full/41743.png", # Clase
+                        "https://a.espncdn.com/combiner/i?img=/i/headshots/mlb/players/full/41829.png", #Blanco
+                        "https://a.espncdn.com/combiner/i?img=/i/headshots/mlb/players/full/34943.png", #Cease
+                        "https://a.espncdn.com/combiner/i?img=/i/headshots/mlb/players/full/4297835.png", #Crochet
+                        "https://a.espncdn.com/combiner/i?img=/i/headshots/mlb/players/full/40429.png", #King
+                        "https://a.espncdn.com/combiner/i?img=/i/headshots/mlb/players/full/33372.png", #Martinez
+                        "https://a.espncdn.com/combiner/i?img=/i/headshots/mlb/players/full/35135.png&w=350&h=254", #Scott
+                        "https://a.espncdn.com/combiner/i?img=/i/headshots/mlb/players/full/41216.png", #Webb
+                        "https://a.espncdn.com/combiner/i?img=/i/headshots/mlb/players/full/33709.png", #Nola
+                        "https://a.espncdn.com/combiner/i?img=/i/headshots/mlb/players/full/41009.png", #Houck
+                        "https://a.espncdn.com/combiner/i?img=/i/headshots/mlb/players/full/32640.png", #Wacha
+                        "https://a.espncdn.com/combiner/i?img=/i/headshots/mlb/players/full/32685.png", #Fried
+                        "https://a.espncdn.com/combiner/i?img=/i/headshots/mlb/players/full/39878.png", #Burnes
+                        "https://a.espncdn.com/i/headshots/mlb/players/full/4654313.png", #Miller
+                        "https://a.espncdn.com/combiner/i?img=/i/headshots/mlb/players/full/42359.png" #Sanchez
+)
+
+CleanPitchData$War <- as.numeric(CleanPitchData$War)
+CleanPitchData$RA <- as.numeric(CleanPitchData$RA)
+CleanPitchData$WAA <- as.numeric(CleanPitchData$WAA)
+CleanPitchData$WAAWP <- as.numeric(CleanPitchData$WAAWP)
+CleanPitchData$ORPG <- as.numeric(CleanPitchData$ORPG)
+CleanPitchData$BIP <- as.numeric(CleanPitchData$BIP)
+CleanPitchData$PFF <- as.numeric(CleanPitchData$PFF)
+CleanPitchData$ERA <- as.numeric(CleanPitchData$ERA)
+CleanPitchData$FIP <- as.numeric(CleanPitchData$FIP)
+CleanPitchData$Age <- as.numeric(CleanPitchData$Age)
+CleanPitchData$Height <- as.numeric(CleanPitchData$Height)
+```
+
+### Creating a Image File Reading Function
+
+This chunk of code allows us to input player images on our plots and graphs. The readPNGfromURL function is used in a majority of our plots. In the first plot, you can see where it works from, and how it works.
+
+```{r}
+#| echo: true
+readPNGfromURL <- function(url) {
+  temp <- tempfile()
+  download.file(url, temp, mode = "wb")
+  img <- readPNG(temp)
+  unlink(temp)
+  return(img)
+}
+```
+
+## Player Hitting/Fielding Relationships
+
+### War v. ORTG
+
+```{r}
+#| echo: true
+r_War_ORTG <- ggplot(data = CleanNoPitchData, 
+       mapping = aes(War, ORTG)) + 
+  geom_point() + 
+  labs(title = "Relationship between WAR and ORTG", 
+       x = "Wins Above Replacement", 
+       y = "Offensive Rating")
+
+for (i in 1:nrow(CleanNoPitchData)) {
+  img <- readPNGfromURL(CleanNoPitchData$img_path[i])
+  
+  r_War_ORTG <- r_War_ORTG + annotation_raster(
+    img, 
+    xmin = CleanNoPitchData$War[i] - 0.2, xmax = CleanNoPitchData$War[i] + 0.2, 
+    ymin = CleanNoPitchData$ORTG[i] - 0.4, ymax = CleanNoPitchData$ORTG[i] + 0.4
+  )
+}
+
+print(r_War_ORTG)
+
+```
+
+In the Graph, we can see that there is a defined positive relationship between WAR and ORTG (Offensive Rating). This tells us that the players that excel at offense, typically will be more impactful to their team. With Aaron Judge having a historic Offensive season and winning AL MVP, you can see him in the top right corner (11.7 ORTG) and possibly being a potential outlier of this plot. Other players to look for are Shohei Ohtani (9.2 ORTG), who shares space with Bobby Witt Jr. (9.2 ORTG) and Gunner Henderson (9.1 ORTG) (the three players closest to Judge). Ohtani won the NL MVP, having the first 50-50 season in MLB history (50 homerusn and 50 stolen bases). Lastly, the only other players in MVP consideration are right around the middle of this graph (Juan Soto, Francisco Lindor, and Ketel Marte), showing that the top MVP vote getters will tend to have higher offensive ratings on average, proving this significance between ORTG and WAR.
+
+### War v. DRTG
+
+```{r}
+r_War_DRTG <- ggplot(data = CleanNoPitchData, 
+       mapping = aes(War, 
+                     DRTG)) +
+  geom_point() +
+  labs(title = "Relationship between WAR and DRTG", 
+       x = "Wins Above Replacement", 
+       y = "Defensive Rating")
+
+for (i in 1:nrow(CleanNoPitchData)) {
+  img <- readPNGfromURL(CleanNoPitchData$img_path[i])
+  
+  r_War_DRTG <- r_War_DRTG + annotation_raster(
+    img, 
+    xmin = CleanNoPitchData$War[i] - 0.2, xmax = CleanNoPitchData$War[i] + 0.2, 
+    ymin = CleanNoPitchData$DRTG[i] - 0.2, ymax = CleanNoPitchData$DRTG[i] + 0.2
+  )
+}
+
+print(r_War_DRTG)
+```
+
+In the Graph, we can see that there is a rough, slightly negative relationship, or no clear relationship, between WAR and DRTG (Defensive Rating). This tells us that the players that excel at defense aren’t confirmed to have a high WAR. Looking at Aaron Judge again (farthest right player), he has the highest WAR out of the top 35 players in the MLB, however, he is a subpar defender (-0.9 DRTG). Additionally, we can see that the plus defenders in Daulton Varsho (3.1 DRTG), Brice Turang (2.7 DRTG), and Andres Gimenez (2.7 DRTG) have the highest Defensive Ratings out of these 35 players but they have a fairly low WAR. Also, similarly to Judge, Marcel Ozuna (bottom left) has a terrible DRTG (-1.7) and also has a low WAR. These players on the graph tell us that defensive rating a not a good predictor of WAR.  
+
+### ORTG v. DRTG
+
+```{r}
+r_ORTG_DRTG <- ggplot(data = CleanNoPitchData, 
+       mapping = aes(x = DRTG, 
+                     y = ORTG)) + 
+  geom_point() +
+  labs(title = "Relationship between ORTG and DRTG", 
+       x = "Defensive Rating", 
+       y = "Offensive Rating")
+
+for (i in 1:nrow(CleanNoPitchData)) {
+  img <- readPNGfromURL(CleanNoPitchData$img_path[i])
+  
+  r_ORTG_DRTG <- r_ORTG_DRTG + annotation_raster(
+    img, 
+    xmin = CleanNoPitchData$DRTG[i] - 0.2, xmax = CleanNoPitchData$DRTG[i] + 0.2, 
+    ymin = CleanNoPitchData$ORTG[i] - 0.5, ymax = CleanNoPitchData$ORTG[i] + 0.5
+  )
+}
+
+print(r_ORTG_DRTG)
+```
+
+In the Graph, we can see that there is a slight negative relationship between ORTG and DRTG. This tells us that the players that excel at offense, typically are not the greatest defenders, and vice versa. On the left most side of the graph around the middle, the 4 players (Shohei Ohtani (blue hat), Yordan Alvarez (black hat), Brent Rooker (green hat), and Marcel Ozuna (below Alvarez)) are all Designated Hitters. This position allows players to only play offense because they are plus hitters and below average defensive players. Next to them are a couple first basemen that share a similar play style. Vladmir Guerrero Jr., Freddie Freeman, and Bryce Harper are pretty good player at the plate, yet show some struggles on firstbase. Lastly, you can see two players that encompass the most ideal post on this graph. Bobby Witt and Gunner Henderson proved this season that they are elite both with a bat and glove in their hands since they have the highest combination of ORTG and DRTG.
+
+### Other Relationships that could help predict WAR
+
+#### ORTG v. Player Weight
+
+```{r}
+r_WHT_ORTG <- ggplot(data = CleanNoPitchData, 
+       mapping = aes(Weight, 
+                     ORTG)) +
+  geom_point()+ 
+  labs(title = "Relationship between ORTG and Weight", 
+     x = "Weight (lbs)", 
+     y = "Offensive Rating")
+
+for (i in 1:nrow(CleanNoPitchData)) {
+  img <- readPNGfromURL(CleanNoPitchData$img_path[i])
+  
+  r_WHT_ORTG <- r_WHT_ORTG + annotation_raster(
+    img, 
+    xmin = CleanNoPitchData$Weight[i] - 3.5, xmax = CleanNoPitchData$Weight[i] + 3.5, 
+    ymin = CleanNoPitchData$ORTG[i] - 0.45, ymax = CleanNoPitchData$ORTG[i] + 0.45
+  )
+}
+
+print(r_WHT_ORTG)
+```
+
+When looking at the relationship between player weight and ORTG, we can see that you could make the case for a positive relationship. That would mean, the heavier you are, the better offensive stats you put up. However, this is not the case. We see that, without outliers in Aaron Judge (top right) and Andres Gimenez (bottom left), there is no defined, strong relationship between weight and ORTG. So, a player can thrive at home plate regardless of their weight.
+
+#### ORTG v. WRC+
+
+```{r}
+r_ORTG_WRC <- ggplot(data = CleanNoTuckerData, 
+       mapping = aes(ORTG, 
+                     WRC_plus)) +
+  geom_point() + 
+  labs(title = "Relationship between ORTG and WRC+", 
+       x = "Offensive Rating", 
+       y = "WRC+")
+
+for (i in 1:nrow(CleanNoTuckerData)) {
+  img <- readPNGfromURL(CleanNoTuckerData$img_path[i])
+  
+  r_ORTG_WRC <- r_ORTG_WRC + annotation_raster(
+    img, 
+    xmin = CleanNoTuckerData$ORTG[i] - 0.4, xmax = CleanNoTuckerData$ORTG[i] + 0.4, 
+    ymin = CleanNoTuckerData$WRC_plus[i] - 7, ymax = CleanNoTuckerData$WRC_plus[i] + 7
+  )
+}
+
+print(r_ORTG_WRC)
+
+```
+
+We can see that WRC+ and ORTG have a very strong, positive relationship. This means that WRC+ is a good predictor for WAR. WRC+ is a variable that is just and adjusted ORTG. It factors in hitting rating across different eras and ballparks using adjusted offensive production. We can see that Aaron Judge is above and beyond the best offensive player, according to this graph. So, we can determine that players with great Offensive Ratings will have great WRC+ numbers.
+
+Kyle Tucker was filtered out of the data for this plot due to him not being eligible for WRC+ (not enough at bats).
+
+## Pitching Relationships
+
+### War v. ERA
+
+```{r}
+r_ERA_WAR <- ggplot(data = CleanPitchData, 
+                    mapping = aes(ERA, 
+                                  War)) +
+  geom_point() + 
+  labs(title = "Relationship between ERA and WAR", 
+       x = "ERA", 
+       y = "WAR")
+
+for (i in 1:nrow(CleanPitchData)) {
+  img <- readPNGfromURL(CleanPitchData$img_path[i])
+  
+  r_ERA_WAR <- r_ERA_WAR + annotation_raster(
+    img, 
+    xmin = CleanPitchData$ERA[i] - 0.1, xmax = CleanPitchData$ERA[i] + 0.1, 
+    ymin = CleanPitchData$War[i] - 0.15, ymax = CleanPitchData$War[i] + 0.15
+  )
+}
+
+print(r_ERA_WAR)
+
+```
+
+In the Graph, we see a steep negative correlation, players who have high WAR usually have low (sub 3) ERA. ERA helps to show the production of a pitcher when they pitch. For example, Paul Skenes had 1.96 ERA last season. If he were to pitch a full game (9 innings), he would only allow 1.96 earned runs. The players toward the top of this plot (Tarik Skubal, Zack Wheeler, Chris Sale, and Hunter Greene) have the highest WAR's for all pitchers this season with sub-3 ERA's (which are elite numbers). Paul Skenes is to the left of the group, proving he is also an elite pitcher, but the reason he is a little lower is due to his team being not that great. The two outlier players that are a lot lower than the rest of the pitchers (Emanuel Clase (farthest left) and Tanner Scott) are relief pitchers. This position goes in to pitch after the starting pitcher either gets to a high pitch count or is playing bad. They typically only pitch one inning, so their ERA's are typically super low. So, this proves that if a player has a low ERA, they will be a more impactful pitcher.
+
+For clarrification, a Run is when a player scores, regardless if the pitcher was at fault. An Earned Run is when a pitcher allows a hit that scores a run (i.e. player its a home run or player gets a base hit that scores a run).
+
+### War v. FIP
+
+```{r}
+r_FIP_WAR <- ggplot(data = CleanPitchData, 
+                    mapping = aes(FIP, 
+                                  War)) +
+  geom_point() + 
+  labs(title = "Relationship between FIP and WAR", 
+       x = "FIP", 
+       y = "WAR")
+
+for (i in 1:nrow(CleanPitchData)) {
+  img <- readPNGfromURL(CleanPitchData$img_path[i])
+  
+  r_FIP_WAR <- r_FIP_WAR + annotation_raster(
+    img, 
+    xmin = CleanPitchData$FIP[i] - 0.07, xmax = CleanPitchData$FIP[i] + 0.07, 
+    ymin = CleanPitchData$War[i] - 0.125, ymax = CleanPitchData$War[i] + 0.125
+  )
+}
+
+print(r_FIP_WAR)
+```
+
+In the Graph, we can conclude that WAR and FIP have a weak negative correlation. This means that a dominant pitcher in the MLB, who has a high WAR, will tend to have a low FIP. Looking back at Paul Skenes, we see him with the top pitchers of last season in this graph, Chris Sale and Tarik Skubal (both of which won Cy Young). The FIP stat keeps the fielding defense constant for all pitchers. The reason that FIP might not be a great predictor of WAR can be shown by two players, Zack Wheeler and Hunter Greene (both top middle). Both of these pitchers were dominant last season, as shown by their high WAR's, however, their FIP values exclude them from the elite pitching group on this plot (top left). This is due to the team fielding defense of these pitchers either being around average or above average. Let's use Hunter Greene as an example. This would mean that his pitching production relies more on fielding outs rather than strike outs (which isn't a bad thing). For some more context about Hunter Greene, he is a super hard thrower and gets a lot of strikeouts, but manages to get hit more often and gives up more walks, which is where the fielding defense comes into play. So, we can see that FIP can be a good predictor of WAR, there just needs to be some additional context for some players.
+
+FIP is similar to ERA, but it keeps the defensive performance of the pitchers team constant, so this is a specific stat that track the individual performance of the pitcher. (only strikes, walks, and home runs allowed).
+
+### ERA v. FIP
+
+```{r}
+r_FIP_ERA <- ggplot(data = CleanPitchData, 
+                    mapping = aes(FIP, 
+                                  ERA)) +
+  geom_point() + 
+  labs(title = "Relationship between ERA and FIP", 
+       x = "FIP", 
+       y = "ERA")
+
+for (i in 1:nrow(CleanPitchData)) {
+  img <- readPNGfromURL(CleanPitchData$img_path[i])
+  
+  r_FIP_ERA <- r_FIP_ERA + annotation_raster(
+    img, 
+    xmin = CleanPitchData$FIP[i] - 0.075, xmax = CleanPitchData$FIP[i] + 0.075, 
+    ymin = CleanPitchData$ERA[i] - 0.15, ymax = CleanPitchData$ERA[i] + 0.15
+  )
+}
+
+print(r_FIP_ERA)
+```
+
+In the Graph, we can see that there is a nice positive correlation between ERA and FIP. Pitchers want to aim for having low values in both stats values. We can see that the elite pitcher we mentioned before (Chris Sale, Tarik Skubal, Paul Skenes, and Zack Wheeler) are in the ideal zone for a pitcher on the plot (sub-3.25 FIP and sub-3 ERA). We again see the two relief pitchers in the zone as well. But, we see one new face that we haven't mentioned before. Reynaldo Lopez (just above Tanner Scott) was a phenomenal pitcher this season, amounting an impressive 1.99 ERA. The Relief Pitcher-turned-Starter had an amazing season, however, he did deal with some injuries this season causing him to miss some time, which is partially a reason his ERA was one of the lowest for a starter. But, when he pitched, he was great. So, we can see that a player with a low ERA will tend to have a low FIP.
+
+The ERA of an average pitcher is around 3.50.
+
+The FIP of an average pitcher is around 4.25.
+
+These two numbers would but an average pitcher in the top right of this graph.
+
+### Other Relationships that could predict WAR
+
+#### FIP v. Age
+
+```{r}
+r_FIP_Age <- ggplot(data = CleanPitchData, 
+                    mapping = aes(Age, 
+                                  FIP)) +
+  geom_point() + 
+  labs(title = "Relationship between Age and FIP", 
+       x = "Age", 
+       y = "FIP")
+
+for (i in 1:nrow(CleanPitchData)) {
+  img <- readPNGfromURL(CleanPitchData$img_path[i])
+  
+  r_FIP_Age <- r_FIP_Age + annotation_raster(
+    img, 
+    xmin = CleanPitchData$Age[i] - 0.4, xmax = CleanPitchData$Age[i] + 0.4, 
+    ymin = CleanPitchData$FIP[i] - 0.075, ymax = CleanPitchData$FIP[i] + 0.075
+  )
+}
+
+print(r_FIP_Age)
+```
+
+Even though it does look like there is slight correlation between Age and FIP, there is no specific age range where a pitcher is dominant. For example, Chris Sale (bottom right) and Paul Skenes (bottom left) are dominant pitchers (low FIP), yet they were born 13 years apart. This is where baseball is different from most other sports, since age isn't a determinant of how good a player is, especially for pitchers. Justin Verlander (not on this graph) is a 41 year old pitcher for the Astros that is finally starting to decline, but has been great for a long time (especially throughout his 30's). If you were to be a basketball player playing at the age of 41, you would most likely end up being an end-of-bench player that would see no time on the court (unless you're Lebron James). So, we can determine that age isn't a good predictor of FIP, even though you think it would be.
+
+#### FIP v. Height
+
+```{r}
+r_FIP_Height <- ggplot(data = CleanPitchData, 
+                    mapping = aes(Height, 
+                                  FIP)) +
+  geom_point() + 
+  labs(title = "Relationship between Height and FIP", 
+       x = "Height", 
+       y = "FIP")
+
+for (i in 1:nrow(CleanPitchData)) {
+  img <- readPNGfromURL(CleanPitchData$img_path[i])
+  
+  r_FIP_Height <- r_FIP_Height + annotation_raster(
+    img, 
+    xmin = CleanPitchData$Height[i] - 0.2, xmax = CleanPitchData$Height[i] + 0.2, 
+    ymin = CleanPitchData$FIP[i] - 0.075, ymax = CleanPitchData$FIP[i] + 0.075
+  )
+}
+
+print(r_FIP_Height)
+```
+
+We can see that there is no correlation between FIP and height, proving that you do not have to be a certain height to be an elite pitcher. However, the best-of-the-best pitchers, historically, tend to be taller. A good majority of the pitchers on this graph capable of throwing near 100 mph and a good majority of pitchers, in today's MLB, are 6-foot plus. The reason people say taller is better is because the taller you are, the harder you throw, which makes you harder to hit. Also high release points make for difficulty to predict a pitch. So, the graph proves that height isn't a great indicator of how good a pitcher is.
+
+## War v. Position
+
+```{r}
+#| echo: true
+CleanBaseballData$War <- as.numeric(CleanBaseballData$War)
+
+ggplot(CleanBaseballData, 
+       aes(x = Position, 
+           y = War)) + 
+  geom_boxplot(alpha = 0.6) + 
+  labs(title = "Side by Side Boxplots comparing WAR between Positions", 
+       x = "Position", 
+       y = "WAR") + 
+  theme_minimal() + 
+  theme(axis.text.x = element_text(angle = 45))
+
+```
+
+Looking at the Side-by-Side Boxplots, we can conclude that position’s don’t determine WAR. The reason some interquartile ranges are bigger than others is solely due to sample size (there were only 2 catchers in the top 35 in WAR). So, a player can have a good WAR regardless of position. 
+
+# Conclusion
+
+## Hitter/Field Players 
+
+WAR looks to be heavily influenced by the offensive production of a player, as shown by the heavy, positive correlation between WAR and Offensive rating. We can see this through the MVP finalists for the AL and the NL being closer to the top right than most players, but more specifically though Aaron Judge. He had the highest ORTG out of any player in the MLB and also had the highest WAR in the league.
+
+We also see that, even though Defensive Rating is a very important stat, it doesn’t contribute that much, with little to no correlation between itself and WAR. Looking at players like Daulton Varsho and Andres Gimenez, they were elite on the defensive side of the game, however, they had some of lowest WAR's in the data set.
+
+We could see that there is a negative correlation between Offensive and Defensive rating, which tells us that if you’re good at offense, you might not be the greatest defender, and vice versa (with a few exceptions). We noticed that the definition of the Designated Hitter position explains their location on the graph (good offense and bad defense). And, to point out two players, we could see that Andres Gimenez, who has a high Defensive Rating, has a low Offensive Rating and low WAR. Aaron Judge, on the other hand, had a low Defensive Rating, but had a high Offensive Rating and high WAR, which aligns with our conclusion of the plot.
+
+Finally, for our other relationship graphs, we concluded that Player Weight was a non derterminant of ORTG. A player can be any realistic weight and still put up a good offensive rating. With WRC+, a player with good WRC+ will have a good Offensive Rating. This makes sense since we learned that WRC+ is an altered Offensive Rating stat, so they're pretty similar which explains the positive correlation.
+
+## Pitchers
+
+We determined that WAR looks to have a negative correlation with both ERA and FIP, meaning the pitchers with high WAR tend to have lower ERA’s and FIP’s. We noticed that the elite group of pitchers (Chris Sale, Tarik Skubal, and Zack Wheeler) tended to be bunched together since they all had low ERA's and low FIP's.
+
+We also see ERA and FIP have a strong positive correlation. This tells us that as your ERA gets worse (increases), your FIP will also get worse (increase).
+
+Lastly, we see that height and age aren’t really a factor in the performance of a pitcher, just a physical attribute. 
+
+## Sources
+
+Stated in the goals section:
+
+ESPN.com, MLB.com, Baseball Savant, Baseball Reference, and Fan Graphs
