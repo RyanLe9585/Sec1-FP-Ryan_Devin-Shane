@@ -27,6 +27,21 @@ One insight that we had was we figured out how to import images and use them on 
 The challenges that we faced was figuring out how to load the data using an HTML and also how to slice, filter, and re-label a data set. Another thing that was challenging was to put a player label for a specific player. Unfortunately, we could not figure out how to make this work, so we pointed out these players specifically in our descriptions and also added labels and images in post in our presentation.
 
 Just to add a little more information about our code, we made sure that it was accessible and easy to understand so that the code is easy to read and reproducible. Also, since the data is strictly baseball numbers, there are no biases in the data, only correct baseball data and isn’t considered sensitive. Finally, we made sure that our code is clean, and made some guidelines which explains to the user how certain areas in the code work. This allows other people to easily modify it and add anything they need to. In addition, to make this process easier sharing the code is very simple. The only difficult part of our code is the process to import images, since we had to create our own function, but outside of that, every other chunk of code can be accessed using common packages
+## FAIR and CARE Principles
+
+### FAIR
+
+- Findable: The data sources are widely accessible via public platforms like ESPN and FanGraphs.
+- Accessible: The raw data is open and available to anyone with internet access.
+- Interoperable: Data has been cleaned and structured in a format compatible with analysis tools.
+- Reusable: Data cleaning ensures reproducibility and accuracy.
+
+### CARE
+
+- Collective Benefit: The analysis serves researchers, fans, and analysts.
+- Authority to Control: The data usage adheres to public domain and licensed access rights.
+- Responsibility: Code and data cleaning methods are clearly documented.
+- Ethics: The analysis avoids misrepresentation or misuse of the dataset.
 
 ### Our Variables
 
