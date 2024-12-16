@@ -20,7 +20,7 @@ The challenges that we faced was figuring out how to load the data using an HTML
 
 ### Goals
 
-### Fiar: 
+ Fair: 
 
 -   Our data is accessible and easy to understand 
 
