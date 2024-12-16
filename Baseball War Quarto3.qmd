@@ -60,7 +60,7 @@ Positions: Player Position (First Base, Second Base, Shortstop, etc.)
 
 Weight: Player Weight (lbs)
 
-Height; Player height (in)
+Height: Player height (in)
 
 ## Our Data
 
