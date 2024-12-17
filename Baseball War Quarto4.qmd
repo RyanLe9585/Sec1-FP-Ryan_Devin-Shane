@@ -1,6 +1,6 @@
 ---
 title: "Baseball War"
-format: html
+format: pdf
 editor: visual
 execute: 
   echo: false
