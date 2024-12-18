@@ -706,6 +706,8 @@ CleanPitchData$ERA <- as.numeric(CleanPitchData$ERA)
 CleanPitchData$FIP <- as.numeric(CleanPitchData$FIP)
 CleanPitchData$Age <- as.numeric(CleanPitchData$Age)
 CleanPitchData$Height <- as.numeric(CleanPitchData$Height)
+
+kable(CleanPitchData, caption = "Pitcher Player Data Table")
 ```
 
 ### Creating a Image File Reading Function
