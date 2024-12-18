@@ -16,7 +16,7 @@ In our report, we will answer the question: What major baseball stats are the mo
 
 In this report, you will see our process of collecting the data, comparisons of stats, and an explanation of how they apply to baseball, along with conclusions based on the graphs and plots we created.
 
----
+
 
 ### Data Collection and Cleaning
 
@@ -107,7 +107,7 @@ ggplot(CleanBaseballData, aes(x = Height, y = FIP)) +
   labs(title = "Relationship Between FIP and Height", x = "Height", y = "FIP") +
   theme_minimal()
 
-Conclusion
+Conclusion 
 These were our Key Findings
 Hitting and Fielding: Offensive metrics, such as ORTG and WRC+, are strong predictors of WAR. Defensive metrics like DRTG show minimal correlation.
 Pitching: Metrics like ERA and FIP are closely correlated with WAR, while physical attributes like height and age do not significantly influence performance.
