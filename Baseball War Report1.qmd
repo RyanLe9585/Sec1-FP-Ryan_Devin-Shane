@@ -1,5 +1,5 @@
 ---
-title: "Baseball War"
+Title: "Baseball War"
 subtitle: Stat 184 Final Project
 format: html
 author: Shane Cumberbatch, Ryan Le, Devin Huffman
@@ -12,7 +12,7 @@ execute:
 
 The history of Baseball stats has just started to become more prominent in the 21st Century with stats like WAR, ERA, and Batting Average being the driving force to determine how great a baseball player really is. However, some of these stats can be somewhat misleading, causing you to believe that a player is a lot better than he actually is, and vice versa.
 
-In our report, we will answer the question: What major baseball stats are the most crucial for predicting WAR? We will compare various stats to players WAR (wins above replacement), so see which stats significantly benefit and help to prove a players importance. Also, we will be comparing physical player attributes (height, weight and age) to see if it has any influence as well.
+In our report, we will answer the question: What major baseball stats are the most crucial for predicting WAR? We will compare various stats to players' WAR (Wins Above Replacement) to see which stats significantly contribute to proving a player's importance. Also, we will be comparing physical player attributes (height, weight and age) to see if it has any influence as well.
 
 In this report, you will see some of our process of collecting our data, the comparisons of stats and an explanation of how they apply to all of baseball, and what conclusions we have from the graphs and plot we created.
 
@@ -1041,7 +1041,7 @@ We determined that WAR looks to have a negative correlation with both ERA and FI
 
 We also see ERA and FIP have a strong positive correlation. This tells us that as your ERA gets worse (increases), your FIP will also get worse (increase). We noticed that there was an ideal area to be in (you want to be sub-3 in ERA and sub-4.25 in FIP). This is where the best of the best pitcher are going to be. We also pointed out the the average pitcher wouldn't be close to this "ideal zone" and would be located to the far upper right of the plot.
 
-Lastly, we see that height and age aren’t really a factor in the performance of a pitcher, just a physical attribute. Fro the relationship between WAR an height, we noticed that there was no clear indicator of height effecting WAR. But, the only present claim is that all of the players included in the pitching data set are 6-foot plus. With the example player we provided (Justin Verlander), we pointed out that for age, you can still be a great pitcher no matter how old you are. Also, we noticed that on the WAR v. Age plot, Paul Skenes and Chris Sale were both great pitchers even though there was a significant age gap.
+Lastly, we see that height and age aren’t really a factor in the performance of a pitcher, just a physical attribute. For the relationship between WAR an height, we noticed that there was no clear indicator of height effecting WAR. But,the only present claim is that all of the players included in the pitching data set are 6-foot plus. With the example player we provided (Justin Verlander), we pointed out that for age, you can still be a great pitcher no matter how old you are. Also, we noticed that on the WAR v. Age plot, Paul Skenes and Chris Sale were both great pitchers even though there was a significant age gap.
 
 ## Sources
 
