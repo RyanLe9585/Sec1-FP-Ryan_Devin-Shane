@@ -64,6 +64,7 @@ library(png)
 library(grid)
 library(ggrepel)
 library(ggforce)
+library(knitr)
 
 #Open Data through HTML
 Baseball_data <- read_html("https://www.espn.com/mlb/war/leaders")
@@ -495,6 +496,8 @@ CleanNoPitchData$WRC_plus <- as.numeric(CleanNoPitchData$WRC_plus)
 #Creating Non-Pitcher-Tucker Data
 CleanNoTuckerData <- CleanNoPitchData %>%
   filter(WRC_plus != 0)
+
+kable(CleanNoPitchData, caption = "Hitter/Fielder Player Data Table")
 ```
 
 ### Pitching
