@@ -517,6 +517,9 @@ CleanNoPitchData$Weight <- as.numeric(CleanNoPitchData$Weight)
 CleanNoPitchData$Height <- as.numeric(CleanNoPitchData$Height)
 CleanNoPitchData$WRC_plus <- as.numeric(CleanNoPitchData$WRC_plus)
 
+CleanNoPitchData <- CleanNoPitchData %>%
+  select(-WAA, -TRPG, -ORPG, -RAA, -WAAWP, -BatSpeed, -Height)
+
 #Creating Non-Pitcher-Tucker Data
 CleanNoTuckerData <- CleanNoPitchData %>%
   filter(WRC_plus != 0)
@@ -730,6 +733,9 @@ CleanPitchData$ERA <- as.numeric(CleanPitchData$ERA)
 CleanPitchData$FIP <- as.numeric(CleanPitchData$FIP)
 CleanPitchData$Age <- as.numeric(CleanPitchData$Age)
 CleanPitchData$Height <- as.numeric(CleanPitchData$Height)
+
+CleanPitchData <- CleanPitchData %>%
+  select(-RA, -RAR, -WAA, -WAAWP, -ORPG, -BIP, -PFF)
 
 kable(CleanPitchData, caption = "Pitcher Player Data Table")
 ```
