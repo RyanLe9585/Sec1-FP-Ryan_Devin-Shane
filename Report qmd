@@ -80,6 +80,7 @@ Pitching Analysis
 
 WAR vs. ERA
 The relationship between WAR and ERA shows a strong negative correlation, where pitchers with lower ERA values tend to have higher WAR, emphasizing the importance of run prevention.
+
 # Plot: WAR vs. ERA
 ggplot(CleanBaseballData, aes(x = ERA, y = War)) +
   geom_point() +
@@ -88,20 +89,23 @@ ggplot(CleanBaseballData, aes(x = ERA, y = War)) +
 
 ERA vs. FIP
 The relationship between ERA and FIP shows a positive correlation, highlighting the consistency between these metrics in evaluating pitching performance.
+
 # Plot: ERA vs. FIP
 ggplot(CleanBaseballData, aes(x = FIP, y = ERA)) +
   geom_point() +
   labs(title = "Relationship Between ERA and FIP", x = "FIP", y = "ERA") +
   theme_minimal()
 Additional Relationships
+
 FIP vs. Age and Height
-# Plot: FIP vs. Age
+
+1) Plot: FIP vs. Age
 ggplot(CleanBaseballData, aes(x = Age, y = FIP)) +
   geom_point() +
   labs(title = "Relationship Between FIP and Age", x = "Age", y = "FIP") +
   theme_minimal()
 
-# Plot: FIP vs. Height
+2) Plot: FIP vs. Height
 ggplot(CleanBaseballData, aes(x = Height, y = FIP)) +
   geom_point() +
   labs(title = "Relationship Between FIP and Height", x = "Height", y = "FIP") +
